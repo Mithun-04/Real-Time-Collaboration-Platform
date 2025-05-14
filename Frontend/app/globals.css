@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* globals.css */
+
+body {
+  font-family: var(--font-raleway), sans-serif;
+  background-color: #0a0a0a;
+  color: white;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-poppins), sans-serif;
+}
+

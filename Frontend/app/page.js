@@ -3,7 +3,7 @@ import React from "react";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import NavBar from "./components/NavBar";
 import { Avatar } from "@heroui/avatar";
-import './Home.css';
+import "./styles/Home.css"; 
 
 export default function Home() {
   return (
@@ -27,7 +27,7 @@ export default function Home() {
             CollabMate brings teams together with seamless tools for collaboration, creativity, and productivity—all in one intuitive platform.
           </p>
           <div className="button-group">
-            <button className="primary-button">
+            <button className="primary-button" onClick={() => window.location.href = "/auth/login"}>
               Get Started
             </button>
             <button className="secondary-button">
@@ -43,5 +43,6 @@ export default function Home() {
         </div>
       </div>
     </div>
+
   );
 }

@@ -12,7 +12,7 @@ export default function NavBar() {
                 <a href="#contact">Contact</a>
             </div>
             <div className="navbar-buttons">
-                <button className="btn-signup">Login</button>
+                <button className="btn-signup" onClick={() => window.location.href = "/auth/login"}>Login</button>
                 <button className="btn-login">Sign Up</button>
             </div>
         </div>

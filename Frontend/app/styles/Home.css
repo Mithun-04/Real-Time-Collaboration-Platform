@@ -1,0 +1,126 @@
+.home-container {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: 
+    linear-gradient(to bottom, #0a0a0a, #000000);
+  position: relative;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: white;
+}
+
+
+
+.content-container {
+  padding: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding-top: 64px;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .content-container {
+    padding-top: 0;
+  }
+}
+
+.heading {
+  font-size: 48px;
+  font-weight: 800;
+  color: white; /* Updated to match the image */
+}
+
+@media (min-width: 768px) {
+  .heading {
+    font-size: 72px;
+  }
+}
+
+.description {
+  margin-top: 24px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #d1d5db; /* Updated to match the image */
+  max-width: 600px; /* Adjusted to match the image */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.button-group {
+  margin-top: 32px;
+}
+
+.primary-button {
+  padding: 12px 24px;
+  background-color: white; /* Updated to match the image */
+  color: black; /* Updated to match the image */
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background-color: #e5e7eb;
+}
+
+.secondary-button {
+  margin-left: 16px;
+  padding: 12px 24px;
+  background-color: transparent;
+  border: 1px solid #6b7280;
+  color: #d1d5db;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: border-color 0.3s, color 0.3s;
+  cursor: pointer;
+}
+
+.secondary-button:hover {
+  border-color: #9ca3af;
+  color: #f3f4f6;
+}
+
+/* Avatar Positioning */
+.avatar {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  font-size: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 1;
+  animation: wobble 3s infinite ease-in-out;
+  overflow: hidden;
+}
+
+.avatar:hover {
+  box-shadow: 0 0 0 2px white, 0 0 8px 2px white;
+}
+
+
+/* Animation delay for each */
+.avatar-1 { top: 35%; left: 0%; animation-delay: 0s; }
+.avatar-2 { top: 35%; right: 0%; animation-delay: 0.5s; }
+.avatar-3 { top: 75%; left: 14%; animation-delay: 1s; }
+.avatar-4 { top: 75%; right: 14%; animation-delay: 1.5s; }
+
+/* Wobble animation */
+@keyframes wobble {
+  0%   { transform: translateY(0) rotate(-2deg) scale(1); }
+  20%  { transform: translateY(-8px) rotate(2deg) scale(1.05); }
+  40%  { transform: translateY(0) rotate(-2deg) scale(1); }
+  60%  { transform: translateY(8px) rotate(2deg) scale(0.98); }
+  80%  { transform: translateY(0) rotate(-2deg) scale(1); }
+  100% { transform: translateY(0) rotate(-2deg) scale(1); }
+}

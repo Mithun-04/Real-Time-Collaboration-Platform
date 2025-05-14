@@ -61,8 +61,8 @@
 
 .primary-button {
   padding: 12px 24px;
-  background-color: white; /* Updated to match the image */
-  color: black; /* Updated to match the image */
+  background-color: #ff3b6c; /* Updated to match the image */
+  color: white; /* Updated to match the image */
   font-weight: 600;
   border-radius: 8px;
   transition: background-color 0.3s;
@@ -71,7 +71,7 @@
 }
 
 .primary-button:hover {
-  background-color: #e5e7eb;
+  background-color: #e33360;
 }
 
 .secondary-button {
@@ -105,7 +105,7 @@
 }
 
 .avatar:hover {
-  box-shadow: 0 0 0 2px white, 0 0 8px 2px white;
+  box-shadow: 0 0 0 2px #ff3b6c, 0 0 8px 2px #e33360, 0 0 16px 2px #e33360;
 }
 
 

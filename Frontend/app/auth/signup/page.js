@@ -1,12 +1,21 @@
+'use client';
 import './SignupPage.css';
-import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useState } from "react";
 
 export default function SignupPage() {
+
+    const [passeyeOpen, setPassEyeOpen] = useState(false);
+    const [eyeOpen, setEyeOpen] = useState(false)
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     return (
         <div className="signup-page">
-            <div className="top-left-title">CollabMate</div>
+            <div className="top-left-title">
+                <span style={{ color: "#ff3c6b" }}>Collab</span>Mate
+            </div>
             <div className="signup-container">
-                <div className="signup-logo">C</div>
+                <div className="signup-logo"></div>
                 <h2 className="signup-header">Create Your Account</h2>
                 <form className="signup-form">
                     <div className="input-container">
@@ -19,11 +28,17 @@ export default function SignupPage() {
                     </div>
                     <div className="input-container">
                         <FaLock className="signup-icon" />
-                        <input type="password" placeholder="Password" className="signup-input" />
+                        <input type={eyeOpen ? "text" : "password"} placeholder="Password" className="signup-input" onChange={e => setPassword(e.target.value)} />
+                        <span className='eye-icon' onClick={() => setEyeOpen(!eyeOpen)}>
+                            {eyeOpen ? <FaEyeSlash /> : <FaEye />}
+                        </span>
                     </div>
                     <div className="input-container">
                         <FaLock className="signup-icon" />
-                        <input type="password" placeholder="Confirm Password" className="signup-input" />
+                        <input type={passeyeOpen ? "text" : "password"} placeholder="Confirm Password" className="signup-input" onChange={e => setConfirmPassword(e.target.value)} />
+                        <span className='eye-icon' onClick={() => setPassEyeOpen(!passeyeOpen)}>
+                            {passeyeOpen ? <FaEyeSlash /> : <FaEye />}
+                        </span>
                     </div>
                     <button type="submit" className="signup-button">Sign Up</button>
                 </form>

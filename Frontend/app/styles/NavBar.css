@@ -26,20 +26,16 @@
 .navbar-links {
     display: flex;
     gap: 20px;
-    /* margin-right: 20px; */
-
     font-size: 18px;
     align-items: center;
     justify-content: space-between;
 }
 
-.btn-login {
+.btn-signup {
     margin-left: 1rem;
     padding: 12px 24px;
-    background-color: white;
-    /* Updated to match the image */
-    color: black;
-    /* Updated to match the image */
+    background-color: #ff3b6e;
+    color: white;
     font-weight: 600;
     border-radius: 8px;
     transition: background-color 0.3s;
@@ -47,22 +43,11 @@
     cursor: pointer;
 }
 
-.btn-login:hover {
-    background-color: #e5e7eb;
+.btn-signup:hover {
+    background-color: #e33360;
 }   
 
-.btn-signup {
-    /* padding: 12px 24px;
-    background-color: #4f46e5;
-    /* Updated to match the image */
-    /* color: white;
-    Updated to match the image */
-    /* font-weight: 600;
-    border-radius: 8px;
-    transition: background-color 0.3s;
-    border: none;
-    cursor: pointer; */ 
-  /* margin-left: 16px; */
+.btn-login {
   padding: 12px 24px;
   background-color: transparent;
   border: 1px solid #6b7280;
@@ -73,7 +58,7 @@
   cursor: pointer;
 }
 
-.btn-signup:hover {
+.btn-login:hover {
     border-color: #e5e7eb;
     color: #e5e7eb;
 }

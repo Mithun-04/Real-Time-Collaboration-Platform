@@ -10,9 +10,12 @@ export default function LoginPage() {
 
     return (
         <div className="login-page"> 
-            <div className="top-left-title">CollabMate</div>
+            <div className="top-left-title">
+                <span style={{ color: "#ff3c6b" }}>Collab</span>Mate
+            </div>
             <div className="login-container">
-                <div className="login-logo">C</div>
+                <div className="login-logo"></div>
+                <h2 className="login-header">Welcome Back</h2>
                 <form className="login-form">
                     <div className="input-container">
                         <FaUser className="login-icon" />
@@ -25,13 +28,12 @@ export default function LoginPage() {
                             placeholder="Password"
                             className="login-input"
                             value={password}
-                            onChange={e => {
-                                console.log(e);
-                                setPassword(e.target.value)}}
+                            onChange={e => setPassword(e.target.value)}
                         />
                         <span
                             className="eye-icon"
                             onClick={() => setEyeOpen(!eyeOpen)}
+
                         >
                             {eyeOpen ? <FaEyeSlash /> : <FaEye />}
                         </span>
@@ -39,7 +41,7 @@ export default function LoginPage() {
                     <button type="submit" className="login-button">Log In</button>
                 </form>
                 <p className="login-footer">
-                    Don't You Have an Account ? - <a href="/auth/signup" className="signup-link">Sign Up</a>
+                    Don't You Have an Account? <a href="/auth/signup" className="signup-link">Sign Up</a>
                 </p>
             </div>
         </div>

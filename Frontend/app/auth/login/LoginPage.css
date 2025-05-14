@@ -41,6 +41,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 1rem;
     /* background-color: rgba(255, 255, 255, 0.05); */
     /* backdrop-filter: blur(15px); */
     padding: 40px;
@@ -53,14 +54,16 @@
     font-size: 28px;
     font-weight: bold;
     color: white;
-    background-color: rgba(255, 255, 255, 0.1);
+    background: url("/assets/pfp_1.jpg");
+     background-size: cover;
+    background-position: center; /* Replace with your image path */
     border-radius: 50%;
     width: 60px;
     height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 30px;
+
 }
 
 /* Form layout */
@@ -68,7 +71,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 /* Input + icon */
@@ -84,11 +87,6 @@
 
 .login-icon {
     margin-right: 10px;
-}
-
-.eye-icon {
-    margin-left: auto;
-    cursor: pointer;
 }
 
 .login-input {
@@ -119,8 +117,9 @@
 
 /* Footer link */
 .login-footer {
-    margin-top: 30px;
+    margin-top: 10px;
     font-size: 14px;
+    color: #ccc;
 }
 
 .login-footer a {
@@ -128,6 +127,8 @@
     text-decoration: none;
 }
 
-.login-footer a:hover {
-    text-decoration: underline;
+.login-header{
+    font-size: 20px;
+    color: white;
+    margin-bottom: 10px;
 }

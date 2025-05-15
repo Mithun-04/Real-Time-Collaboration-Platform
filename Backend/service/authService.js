@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 const signup = async (name, email, password) => {
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ name });
   if (existingUser) throw { status: 400, message: "User already exists" };
 
   const salt = await bcrypt.genSalt(10);
@@ -13,7 +13,7 @@ const signup = async (name, email, password) => {
   const newUser = new User({ name, email, password: hashedPassword });
   await newUser.save();
 
-  return { msg: "User registered successfully" };
+  return { message: "User registered successfully" };
 };
 
 

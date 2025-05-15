@@ -6,6 +6,7 @@ export const signup = async (req, res) => {
     const result = await authService.signup(name, email, password);
     res.status(201).json(result);
   } catch (error) {
+    console.log(error);
     res.status(error.status || 500).json({ error: error.message });
   }
 };

@@ -28,8 +28,8 @@ export default function LoginPage() {
             if (res.status === 200) {
                 toast.success("Login successful");
                 setTimeout(() => {
-                    window.location.href = "/";
-                }, 2000);
+                    window.location.href = "/dashboard";
+                }, 1000);
             } else {
                 toast.error(res.message || "Login failed");
             }

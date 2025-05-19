@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
 
 const app = express();
 dotenv.config();
@@ -31,3 +32,4 @@ app.listen(PORT, () => {
 //routes
 
 app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);

@@ -1,0 +1,76 @@
+.add-project-card {
+    display: flex;
+    flex-direction: column;
+    width: 22rem;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background-color: #111; /* deep black background */
+    color: #ffffff;
+    border: 1px solid #2a2a2a;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    gap: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: absolute;
+    top: 30%;
+    left: 40%;
+    z-index: 25;
+
+}
+
+.add-project-card h2 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: #ffffff;
+}
+
+.project-name-input,
+.project-description-input {
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.5rem;
+    border: 1px solid #333;
+    background-color: #1a1a1a;
+    color: #fff;
+    outline: none;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-name-input:focus,
+.project-description-input:focus {
+    border-color: #ff3b6c;
+    box-shadow: 0 0 0 2px rgba(255, 59, 108, 0.4);
+}
+
+.project-description-input {
+    resize: vertical;
+    min-height: 4rem;
+    line-height: 1.4;
+}
+
+.add-project-button {
+    margin-top: 0.8rem;
+    padding: 0.7rem 1rem;
+    background-color: #ff3b6c;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.add-project-header {
+    font-size: 1.5rem;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+}
+
+.close-icon{
+    width: 1.7rem;
+    height: 1.7rem;
+    color: #ffffff;
+    font-size: 1rem;
+    cursor: pointer;
+}

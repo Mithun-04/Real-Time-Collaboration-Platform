@@ -1,19 +1,24 @@
 import User from "../models/User.js";
 import Project from "../models/Project.js";
-import Invitation from "../models/Invitation.js";
 import mongoose from "mongoose";
 
-const createProject = async ({ name, managerId }) => {
+const createProject = async ({ name, description, managerId }) => {
 
     const user = await User.findById(managerId);
 
     if (!user) {
 
-        throw new Error('User not Found')
+        throw {message : 'User not Found'};
+    }
+    const existingProject = await Project.findOne({ name });
+
+    if (existingProject) {
+        throw {message : 'Project with this name already exists'};
     }
 
     const project = new Project({
         name,
+        description,
         manager: managerId,
         members: [{ userId: managerId, role: "manager" }]
     })
@@ -41,10 +46,11 @@ const getProjects = async (userId) => {
             { manager: userId },
             { 'members.userId': userId }
         ],
-    }).select('_id name manager').lean();
+    }).select('_id name description manager').lean();
 
     const transformedProjects = projects.map(project => ({
         _id: project._id,
+        description: project.description,
         name: project.name,
         isManager: project.manager.toString() === userId.toString()
     }));

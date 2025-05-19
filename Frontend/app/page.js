@@ -3,12 +3,12 @@ import React from "react";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import NavBar from "./components/NavBar";
 import { Avatar } from "@heroui/avatar";
-import "./styles/Home.css"; 
+import "./styles/Home.css";
 
 export default function Home() {
   return (
     <div className="home">
-      <NavBar/>
+      <NavBar />
       <div className="home-container">
         <Spotlight
           translateY={-300}

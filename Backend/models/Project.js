@@ -2,7 +2,7 @@
 import mongoose from 'mongoose';
 
 const ProjectSchema = new mongoose.Schema({
-  name: { type: String, required: true, trim: true },
+  name: { type: String, required: true, trim: true , unique: true},
   description: { type: String, trim: true },
   manager: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   members: [{

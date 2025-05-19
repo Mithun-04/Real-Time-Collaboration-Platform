@@ -1,16 +1,22 @@
 'use client';
 import './LoginPage.css';
-import { FaUser, FaLock, FaEye, FaEyeSlash} from "react-icons/fa";
+import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import Cookies from 'universal-cookie';
+
+
+
 
 export default function LoginPage() {
     const [eyeOpen, setEyeOpen] = useState(false);
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
 
-    async function handleLogin(e){
+    const cookies = new Cookies();
+    
+    async function handleLogin(e) {
         e.preventDefault();
         if (!name || !password) {
             toast.error("Please fill all fields");
@@ -25,7 +31,9 @@ export default function LoginPage() {
 
         try {
             const res = await axios.post("http://localhost:5000/api/auth/login", data);
+            console.log(res);
             if (res.status === 200) {
+                cookies.set("token", res.data.token, { path: "/", expires: new Date(Date.now() + 86400000) });
                 toast.success("Login successful");
                 setTimeout(() => {
                     window.location.href = "/dashboard";
@@ -41,7 +49,7 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="login-page"> 
+        <div className="login-page">
             <div className="top-left-title" onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }}>
                 <span style={{ color: "#ff3c6b" }}>Collab</span>Mate
             </div>
@@ -51,7 +59,7 @@ export default function LoginPage() {
                 <form className="login-form">
                     <div className="input-container">
                         <FaUser className="login-icon" />
-                        <input type="text" placeholder="Username" className="login-input" onChange={e => setName(e.target.value)}/>
+                        <input type="text" placeholder="Username" className="login-input" onChange={e => setName(e.target.value)} />
                     </div>
                     <div className="input-container">
                         <FaLock className="login-icon" />

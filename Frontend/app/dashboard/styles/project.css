@@ -4,7 +4,7 @@
     gap: 1rem;
     padding: 1rem;
     width: 15rem;
-    height: 12rem;
+    height: 14rem;
     border-radius: 0.5rem;
     background-color: #1e1e1e;;
     color: #ffffff;
@@ -37,6 +37,5 @@
     object-fit: cover;
     color: #ffffff;
     font-size: 1.5rem;
-    margin-left: 35%;
     
 }

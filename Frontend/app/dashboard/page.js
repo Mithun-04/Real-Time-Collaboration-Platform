@@ -1,80 +1,105 @@
 'use client';
+import { useState, useEffect } from "react";
 import Project from "./components/project";
-import './dashboard.css';
+import SideBar from "./components/sideBar";
+import Header from "./components/header";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import AddProjectCard from "./components/addprojectCard";
 import { TbRefresh } from "react-icons/tb";
+import axios from "axios";
+import Cookies from "universal-cookie";
+import toast from "react-hot-toast";
+import './styles/dashboard.css';
 
 export default function Dashboard() {
-    const projects = [
-        {
-            id: 1,
-            name: "Project 1",
-            description: "Description for project 1",
-            image: "/assets/pfp_1.jpg",
-        },
-        {
-            id: 2,
-            name: "Project 2",
-            description: "Description for project 2",
-            image: "/project2.jpg",
-        },
-        {
-            id: 3,
-            name: "Project 3",
-            description: "Description for project 3",
-            image: "/project3.jpg",
-        },
-        {
-            id: 4,
-            name: "Project 4",
-            description: "Description for project 4",
-            image: "/project4.jpg",
-        },
-        {
-            id: 5,
-            name: "Project 5",
-            description: "Description for project 5",
-            image: "/project5.jpg",
-        },
-        // {
-        //     id: 6,
-        //     name: "Project 6",
-        //     description: "Description for project 6",
-        //     image: "/project6.jpg",
-        // },
-        // {
-        //     id: 7,
-        //     name: "Project 7",
-        //     description: "Description for project 7",
-        //     image: "/project7.jpg",
-        // },
-        // {
-        //     id: 8,
-        //     name: "Project 8",
-        //     description: "Description for project 8",
-        //     image: "/project8.jpg",
-        // },
-    ];
+    const [showAddProject, setShowAddProject] = useState(false);
+    const [showProject, setShowProject] = useState(false);
+    const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    async function fetchProjects() {
+        const token = new Cookies().get("token");
+
+        if (!token) {
+            toast.error("Please login again");
+            setTimeout(() => {
+                window.location.href = "/auth/login";
+            }, 1000);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const res = await axios.get('http://localhost:5000/api/projects', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (res.status === 200) {
+                setProjects(res.data.data);
+            } else {
+                toast.error(res.data.message || "Failed to fetch projects");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error(error?.response?.data?.message || "Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchProjects();
+        setShowProject(true);
+    }, []);
 
     return (
         <div className="dashboard">
-            <div className="backdrop"></div>
-            <div className="projects-container">
-                <div className="projects-header">
-                    <IoMdArrowRoundBack className="back-icon" onClick={() => window.location.href = "/auth/login"}/>
-                    <h2>Choose a Project</h2>
-                    <TbRefresh className="back-icon" onClick={() => alert("Refreshed")} />
-                </div>
-                <div className="projects">
-                    {projects.map((project) => (
-                        <Project key={project.id} project={project} onClick={() => alert(`Clicked on ${project.name}`)} />
-                    ))}
-                    <div className="add-project">
-                        <h3>Add New Project</h3>
-                        <div className="add-icon">+</div>
+            <div className={`backdrop ${showAddProject ? 'blurred' : ''}`}></div>
+            <SideBar />
+            <Header onAddProject={() => { setShowProject(true) }} />
+
+            {showProject && (
+                <div className="projects-container-overlay">
+                    <div className={`projects-container ${showAddProject ? 'blurred' : ''}`}>
+                        <div className="projects-header">
+                            <IoMdArrowRoundBack className="back-icon" onClick={() => setShowProject(false)} />
+                            <h2>Choose a Project</h2>
+                            <TbRefresh className="back-icon" onClick={fetchProjects} />
+                        </div>
+
+                        <div className="projects">
+                            {loading ? (
+                                <> </>
+                            ) : projects.length > 0 ? (
+                                projects.map((project, index) => (
+                                    <Project
+                                        key={project.id || `project-${index}`}
+                                        project={project}
+                                        onClick={() => alert(`Clicked on ${project.name}`)}
+                                    />
+                                ))
+
+                            ) : (<></>)
+                            }
+
+                            <div className="add-project" onClick={() => setShowAddProject(true)}>
+                                <h3>Add New Project</h3>
+                                <div className="add-icon">+</div>
+                            </div>
+                        </div>
                     </div>
+                </div>)}
+
+            {showAddProject && (
+                <div className="modal-overlay">
+                    <AddProjectCard onClose={() => setShowAddProject(false)} />
                 </div>
-            </div>
+            )}
         </div>
+
+
     );
 }

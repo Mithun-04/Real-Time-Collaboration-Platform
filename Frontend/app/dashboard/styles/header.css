@@ -1,0 +1,50 @@
+.header{
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    position: fixed;
+    width: 100vw;
+}
+
+.content-container {
+    padding: 24px;
+    padding-right: 34px;
+    width: 20rem;
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile{
+    background: url('/assets/pfp_1.jpg');
+    background-size: cover;
+    background-position: center; /* Replace with your image path */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+}
+
+.message-icon{
+    width: 2rem;
+    height: 2rem;
+    margin: 0;
+    align-self: center;
+    object-fit: cover;
+    color: #ffffff;
+
+}
+
+.add-proj{
+    /* background-color: #ff3b6c; */
+    border: none;
+    padding: 14px;
+    border-radius: 30px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    border: 1px solid #ff3b6c;
+}

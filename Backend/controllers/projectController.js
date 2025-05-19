@@ -3,14 +3,15 @@ import projectService from "../service/projectService.js"
 const createProject = async (req, res) => {
 
     try {
-        const name = req.body.projectname;
-
+        const name = req.body.name;
+        const description = req.body.description;
         const managerId = req.user.id;
 
-        console.log(managerId);
+        console.log(name, description, managerId);
 
         const newProject = await projectService.createProject({
             name,
+            description,
             managerId
         })
 
@@ -21,8 +22,7 @@ const createProject = async (req, res) => {
         })
     }
     catch (error) {
-        res.status(500).json({
-            success: false,
+        res.status(400).json({
             message: error.message || 'Failed to create project',
         });
     }
@@ -74,30 +74,30 @@ const getProjectById = async (req, res) => {
 
 const inviteMembers = async (req, res) => {
     try {
-      const projectId = req.params.id;
-      const managerId = req.user.id;
-      const invitations = req.body; 
-  
-      if (!Array.isArray(invitations) || invitations.length === 0) {
-        throw new Error('Request body must be a non-empty array of invitations');
-      }
-      await projectService.inviteMembersToProject(projectId, managerId, invitations);
-  
-      res.status(200).json({
-        success: true,
-        message: 'Invitations sent successfully',
-      });
+        const projectId = req.params.id;
+        const managerId = req.user.id;
+        const invitations = req.body;
+
+        if (!Array.isArray(invitations) || invitations.length === 0) {
+            throw new Error('Request body must be a non-empty array of invitations');
+        }
+        await projectService.inviteMembersToProject(projectId, managerId, invitations);
+
+        res.status(200).json({
+            success: true,
+            message: 'Invitations sent successfully',
+        });
     } catch (error) {
-      res.status(
-        error.message === 'Project not found' || error.message === 'Unauthorized' || error.message.includes('Request body')
-          ? 400
-          : 500
-      ).json({
-        success: false,
-        message: error.message || 'Failed to send invitations',
-      });
+        res.status(
+            error.message === 'Project not found' || error.message === 'Unauthorized' || error.message.includes('Request body')
+                ? 400
+                : 500
+        ).json({
+            success: false,
+            message: error.message || 'Failed to send invitations',
+        });
     }
-  };
+};
 
 export default {
     createProject,

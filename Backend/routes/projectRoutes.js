@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import projectController from "../controller/projectController.js";
+import projectController from "../controllers/projectController.js";
 //import { authMiddleware, managerMiddleware } from '../middleware/authMiddleware.js';
 import authMiddleware from "../middleware/authMiddleware.js";
 

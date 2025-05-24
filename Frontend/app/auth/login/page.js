@@ -34,6 +34,7 @@ export default function LoginPage() {
             console.log(res);
             if (res.status === 200) {
                 cookies.set("token", res.data.token, { path: "/", expires: new Date(Date.now() + 86400000) });
+                cookies.set("user", res.data.user, { path: "/", expires: new Date(Date.now() + 86400000) });
                 toast.success("Login successful");
                 setTimeout(() => {
                     window.location.href = "/dashboard";

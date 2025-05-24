@@ -1,16 +1,57 @@
 'use client';
 import './LoginPage.css';
-import { FaUser, FaLock, FaEye, FaEyeSlash} from "react-icons/fa";
-
+import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import Cookies from 'universal-cookie';
+
+
+
 
 export default function LoginPage() {
     const [eyeOpen, setEyeOpen] = useState(false);
     const [password, setPassword] = useState("");
+    const [name, setName] = useState("");
+
+    const cookies = new Cookies();
+    
+    async function handleLogin(e) {
+        e.preventDefault();
+        if (!name || !password) {
+            toast.error("Please fill all fields");
+            return;
+        }
+        const data = {
+            name,
+            password
+        }
+
+        console.log(data);
+
+        try {
+            const res = await axios.post("http://localhost:5000/api/auth/login", data);
+            console.log(res);
+            if (res.status === 200) {
+                cookies.set("token", res.data.token, { path: "/", expires: new Date(Date.now() + 86400000) });
+                cookies.set("user", res.data.user, { path: "/", expires: new Date(Date.now() + 86400000) });
+                toast.success("Login successful");
+                setTimeout(() => {
+                    window.location.href = "/dashboard";
+                }, 1000);
+            } else {
+                toast.error(res.message || "Login failed");
+            }
+        }
+        catch (error) {
+            toast.error(error.response.data.error || "Something went wrong");
+            console.log(error);
+        }
+    }
 
     return (
-        <div className="login-page"> 
-            <div className="top-left-title">
+        <div className="login-page">
+            <div className="top-left-title" onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }}>
                 <span style={{ color: "#ff3c6b" }}>Collab</span>Mate
             </div>
             <div className="login-container">
@@ -19,7 +60,7 @@ export default function LoginPage() {
                 <form className="login-form">
                     <div className="input-container">
                         <FaUser className="login-icon" />
-                        <input type="text" placeholder="Username" className="login-input" />
+                        <input type="text" placeholder="Username" className="login-input" onChange={e => setName(e.target.value)} />
                     </div>
                     <div className="input-container">
                         <FaLock className="login-icon" />
@@ -38,7 +79,7 @@ export default function LoginPage() {
                             {eyeOpen ? <FaEyeSlash /> : <FaEye />}
                         </span>
                     </div>
-                    <button type="submit" className="login-button">Log In</button>
+                    <button className="login-button" onClick={handleLogin}>Log In</button>
                 </form>
                 <p className="login-footer">
                     Don't You Have an Account? <a href="/auth/signup" className="signup-link">Sign Up</a>

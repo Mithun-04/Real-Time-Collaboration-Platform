@@ -1,0 +1,67 @@
+.header{
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-items: center;
+    justify-content: space-between;
+    width: 85vw;
+}
+
+.header-title{
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+.content-container {
+    padding: 16px;
+    min-width: 20rem;
+    max-width: 100%;
+    width: auto;
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.profile{
+    background: url('/assets/pfp_1.jpg');
+    background-size: cover;
+    background-position: center; /* Replace with your image path */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+}
+
+.message-icon{
+    width: 2rem;
+    height: 2rem;
+    margin: 0;
+    align-self: center;
+    object-fit: cover;
+    color: #ffffff;
+
+}
+
+.add-proj{
+    /* background-color: #ff3b6c; */
+    border: none;
+    padding: 14px;
+    border-radius: 30px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    border: 1px solid #ff3b6c;
+    min-width: 120px;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+}

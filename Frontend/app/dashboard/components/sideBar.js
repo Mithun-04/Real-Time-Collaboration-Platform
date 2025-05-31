@@ -1,8 +1,9 @@
 import '../styles/sideBar.css';
 import { FaTasks, FaCalendarAlt, FaFileAlt, FaSignOutAlt } from 'react-icons/fa';
+import { ChartNoAxesCombined } from 'lucide-react';
 import { MdManageAccounts } from "react-icons/md";
 
-export default function SideBar({ onClose }) {
+export default function SideBar({ onNavigate, onClose }) {
     return (
         <div className="sidebar">
             <div className="sidebar-header">
@@ -11,7 +12,11 @@ export default function SideBar({ onClose }) {
 
             <div className="sidebar-content">
                 <ul className="sidebar-menu">
-                    <li className="sidebar-item">
+                    <li className="sidebar-item" onClick={() => onNavigate("reports")}>
+                        <ChartNoAxesCombined className="sidebar-icon"  />
+                        Reports
+                    </li>
+                    <li className="sidebar-item" onClick={() => onNavigate("tasks")}>
                         <FaTasks className="sidebar-icon" />
                         Tasks
                     </li>
@@ -22,10 +27,6 @@ export default function SideBar({ onClose }) {
                     <li className="sidebar-item">
                         <FaFileAlt className="sidebar-icon" />
                         Documents
-                    </li>
-                    <li className="sidebar-item">
-                        <MdManageAccounts className="sidebar-icon" />
-                        Manage
                     </li>
                     <li className="sidebar-item logout" onClick={onClose}>
                         <FaSignOutAlt className="sidebar-icon" />

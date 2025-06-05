@@ -109,9 +109,19 @@
 }
 
 /* Status */
-.task-status {
+.task-status.to-do {
   background-color: #78350f;
   color: #fef3c7;
+}
+
+.task-status.doing {
+  background-color: #2563eb;
+  color: #dbeafe;
+}
+
+.task-status.done {
+  background-color: #059669;
+  color: #d1fae5;
 }
 
 /* Priority Levels */

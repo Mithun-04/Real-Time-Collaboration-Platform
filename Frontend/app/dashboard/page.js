@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import './styles/dashboard.css';
 import Reports from "./components/reports";
 import Tasks from "./components/tasks";
+import Notification from "./components/notification";
 import { set } from "mongoose";
 
 
@@ -84,6 +85,7 @@ export default function Dashboard() {
                 <Header onAddProject={() => { setShowProject(true) }} selectedProject={selectedProject} />
                 {activeSection === "reports" && <Reports />}
                 {activeSection === "tasks" && <Tasks />}
+                {activeSection === "notification" && <Notification selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''} />}
             </div>
 
             {showProject && (

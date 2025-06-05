@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Project from "../models/Project.js";
+import Invitation from "../models/Invitation.js";
 import mongoose from "mongoose";
 
 const createProject = async ({ name, description, managerId }) => {
@@ -100,6 +101,7 @@ const inviteMembersToProject = async (projectId, managerId, invitations) => {
 
     // Fetch the project
     const project = await Project.findById(projectObjectId);
+    // console.log('Project:', project); // Log the project for debugging
     if (!project) {
         throw new Error('Project not found');
     }
@@ -114,15 +116,14 @@ const inviteMembersToProject = async (projectId, managerId, invitations) => {
     const invitationDocs = [];
 
     for (const invitation of invitations) {
-        if (!invitation.name || !invitation.role) {
-            throw new Error('Each invitation must have a username and role');
-        }
-        if (!validRoles.includes(invitation.role)) {
-            throw new Error(`Invalid role: ${invitation.role}. Must be one of ${validRoles}`);
+
+        if(!invitation.role){
+            invitation.role = 'member'; // Default to 'member' if no role is provided
         }
 
         // Find user by username
         const user = await User.findOne({ name: invitation.name });
+        console.log('User found:', user); // Log the user for debugging
         if (!user) {
             throw new Error(`User with username ${invitation.username} not found`);
         }
@@ -135,6 +136,17 @@ const inviteMembersToProject = async (projectId, managerId, invitations) => {
             status: 'pending',
         });
         const isAlreadyMember = project.members.some(m => m.userId.toString() === userId.toString());
+
+        if(existingInvitation){
+            throw { status: 400, message: `User with username ${invitation.name} already has a pending invitation for this project` };
+        }
+
+        if(isAlreadyMember){
+            throw {status : 400 , message : `User with username ${invitation.name} is already a member of this project`};
+        }
+
+        console.log('Existing Invitation:', existingInvitation); // Log existing invitation for debugging
+        console.log('Is Already Member:', isAlreadyMember); // Log membership status for debugging
 
         if (!existingInvitation && !isAlreadyMember) {
             invitationDocs.push({

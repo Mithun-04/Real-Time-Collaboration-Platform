@@ -1,5 +1,6 @@
 import projectService from "../service/projectService.js"
 
+
 const createProject = async (req, res) => {
 
     try {
@@ -88,13 +89,11 @@ const inviteMembers = async (req, res) => {
             message: 'Invitations sent successfully',
         });
     } catch (error) {
-        res.status(
-            error.message === 'Project not found' || error.message === 'Unauthorized' || error.message.includes('Request body')
-                ? 400
-                : 500
-        ).json({
+        const status = error.status || 500;
+        const message = error.message || 'Failed to send invitations';
+        res.status(status).json({
             success: false,
-            message: error.message || 'Failed to send invitations',
+            message,
         });
     }
 };

@@ -1,0 +1,237 @@
+.notification-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    gap: 1rem;
+    /* border: #6b6262 1px solid; */
+    border-radius: 1rem;
+    padding: 1rem;
+}
+
+.invitation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: #6b6262 1px solid;
+    width: 50%;
+    max-height: 100%;
+    height: 100%;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    max-width: 800px;
+    margin: 2rem auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.meassage-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: #6b6262 1px solid;
+    width: 50%;
+    max-height: 100%;
+    height: 100%;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    max-width: 800px;
+    margin: 2rem auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.invitation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.invitation-header button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: #1e1e1e;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.invitation-header button:hover {
+    background-color: #2a2929;
+}
+
+.invitation-header button.active {
+    background-color: #ff3b6cc6;
+    color: rgb(255, 255, 255);
+}
+
+.refresh-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+}
+
+.invitation-content{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 800px;
+    overflow-y: auto;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 1rem;
+    gap: 16px;
+}
+
+.invitations{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-height: 100%;
+    height: 100%;
+    overflow-y: auto;
+    gap: 1rem;
+}
+.invitation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1e1e1e;
+  width: 100%;
+  padding: 20px;
+  margin-bottom: 8px;
+  border-radius: 16px;
+  transition: box-shadow 0.3s ease;
+}
+
+.invitation-item:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.invitation-details h2 {
+  font-size: 1.25rem;
+  color: #ffffff;
+  margin: 0;
+}
+
+.invitation-details p {
+  font-size: 0.875rem;
+  color: #ffffff;
+  margin: 4px 0 0 0;
+}
+
+.invitation-actions {
+  display: flex;
+  /* flex-direction: column; */
+  gap: 12px;
+}
+
+.accept-button,
+.decline-button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.accept-button {
+  background-color: #38a169; /* Green */
+  color: white;
+}
+
+.accept-button:hover {
+  background-color: #2f855a;
+}
+
+.decline-button {
+  background-color: #e53e3e; /* Red */
+  color: white;
+}
+
+.decline-button:hover {
+  background-color: #c53030;
+}
+
+.search-results {
+  max-height: 200px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border: 0.5px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.search-result-item {
+  padding: 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap : 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #1e1e1e;
+  background-color: transparent;
+  transition: background 0.2s;
+}
+
+.search-result-item.selected {
+  background-color: #23272f;
+  border-left: #38a169 4px solid; /* subtle green accent */
+}
+
+.user-avatar {
+  width: 40px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ccc;
+}
+
+.no-users-found {
+  padding: 10px;
+  color: #888;
+}
+
+.selected-users {
+  margin-bottom: 20px;
+}
+
+.selected-users-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.selected-user-item {
+  padding: 10px;
+  border-bottom: 1px solid #1e1e1e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remove-user-btn {
+  background: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.no-users-selected {
+  color: #888;
+}

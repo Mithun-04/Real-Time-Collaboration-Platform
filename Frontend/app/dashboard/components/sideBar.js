@@ -20,9 +20,9 @@ export default function SideBar({ onNavigate, onClose }) {
                         <FaTasks className="sidebar-icon" />
                         Tasks
                     </li>
-                    <li className="sidebar-item">
-                        <FaCalendarAlt className="sidebar-icon" />
-                        Deadlines
+                    <li className="sidebar-item" onClick={() => onNavigate("notification")}>
+                        <MdManageAccounts className="sidebar-icon" />
+                        Manage
                     </li>
                     <li className="sidebar-item">
                         <FaFileAlt className="sidebar-icon" />

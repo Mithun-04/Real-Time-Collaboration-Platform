@@ -9,11 +9,14 @@ const getUserInvitations = async (userId) => {
     userId: userObjectId,
     status: 'pending',
   })
-    .populate('projectId', 'name manager') // Populate project name and manager
     .populate({
-      path: 'projectId.manager',
-      select: 'name', // Only get the manager's name
-      model: 'User'
+      path: 'projectId',
+      select: 'name manager',
+      populate: {
+        path: 'manager',
+        select: 'name',
+        model: 'User'
+      }
     });
   return invitations;
 };

@@ -9,12 +9,12 @@ const createProject = async ({ name, description, managerId }) => {
 
     if (!user) {
 
-        throw {message : 'User not Found'};
+        throw { message: 'User not Found' };
     }
     const existingProject = await Project.findOne({ name });
 
     if (existingProject) {
-        throw {message : 'Project with this name already exists'};
+        throw { message: 'Project with this name already exists' };
     }
 
     const project = new Project({
@@ -117,7 +117,7 @@ const inviteMembersToProject = async (projectId, managerId, invitations) => {
 
     for (const invitation of invitations) {
 
-        if(!invitation.role){
+        if (!invitation.role) {
             invitation.role = 'member'; // Default to 'member' if no role is provided
         }
 
@@ -137,12 +137,12 @@ const inviteMembersToProject = async (projectId, managerId, invitations) => {
         });
         const isAlreadyMember = project.members.some(m => m.userId.toString() === userId.toString());
 
-        if(existingInvitation){
+        if (existingInvitation) {
             throw { status: 400, message: `User with username ${invitation.name} already has a pending invitation for this project` };
         }
 
-        if(isAlreadyMember){
-            throw {status : 400 , message : `User with username ${invitation.name} is already a member of this project`};
+        if (isAlreadyMember) {
+            throw { status: 400, message: `User with username ${invitation.name} is already a member of this project` };
         }
 
         console.log('Existing Invitation:', existingInvitation); // Log existing invitation for debugging
@@ -163,9 +163,33 @@ const inviteMembersToProject = async (projectId, managerId, invitations) => {
 
     return;
 };
+
+const getProjectMembers = async (projectId) => {
+
+    try {
+        const project = await Project.findById(projectId).populate('members.userId', 'name email');
+        if (!project) {
+            throw {status : 400 , meassage : 'Project not found'};
+        }
+        console.log('Project Members:', project.members); 
+        return project.members.map(member => ({
+            userId: member.userId._id,
+            name: member.userId.name,
+            email: member.userId.email,
+            role: member.role
+        }));
+    }
+    catch (error) {
+        throw { status : error.status || 500 , message:'Failed to retrieve project members' };
+    }
+};
+
+
+
 export default {
     createProject,
     getProjects,
     getProjectDetails,
-    inviteMembersToProject
+    inviteMembersToProject,
+    getProjectMembers
 }

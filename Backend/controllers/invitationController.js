@@ -19,7 +19,15 @@ const getUserInvitations = async (req, res) => {
 
 const acceptInvitation = async (req, res) => {
   try {
-    const { invitationId } = req.body;
+    let invitationId;
+    if (typeof req.body === 'string') {
+      invitationId = req.body;
+    } else if (typeof req.body === 'object' && req.body.invitationId) {
+      invitationId = req.body.invitationId;
+    } else {
+      throw new Error('invitationId is required');
+    }
+    console.log("Accepting invitation with ID:", invitationId);
     const userId = req.user.id;
     const project = await invitationService.acceptInvitation(invitationId, userId);
     res.status(200).json({
@@ -37,7 +45,14 @@ const acceptInvitation = async (req, res) => {
 
 const declineInvitation = async (req, res) => {
   try {
-    const { invitationId } = req.body;
+    let invitationId;
+    if (typeof req.body === 'string') {
+      invitationId = req.body;
+    } else if (typeof req.body === 'object' && req.body.invitationId) {
+      invitationId = req.body.invitationId;
+    } else {
+      throw new Error('invitationId is required');
+    }
     const userId = req.user.id; // Changed from req.user._id to req.user.id for consistency
     await invitationService.declineInvitation(invitationId, userId);
     res.status(200).json({

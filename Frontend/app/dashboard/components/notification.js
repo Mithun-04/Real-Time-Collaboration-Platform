@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, use } from "react";
 import "../styles/notification.css";
 import { TbRefresh } from "react-icons/tb";
 import Cookies from "universal-cookie";
@@ -6,12 +6,31 @@ import toast from "react-hot-toast";
 import axios from "axios";
 
 export default function Notification({ selectedProjectId }) {
+
   const [activeTab, setActiveTab] = useState("my-invitation");
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [Invitations, setInvitations] = useState([]);
+  const [projectMembers, setProjectMembers] = useState([]);
 
   const cookies = new Cookies();
+
+  useEffect(() => {
+    fetchInvitations();// Fetch invitations when component mounts
+  }, []);
+
+  useEffect(() => {
+    setSearchResults([]);
+    setSearchQuery('');
+    setSelectedUsers([]);
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (selectedProjectId) {
+      fetchProjectMembers(selectedProjectId);
+    }
+  }, [selectedProjectId]);
 
   const colors = [
     '#FFB6C1', // Light Pink
@@ -30,7 +49,7 @@ export default function Notification({ selectedProjectId }) {
   function getColor(name) {
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 8) - hash);
+      hash = name.charCodeAt(i) + ((hash << 6) - hash);
     }
     return colors[Math.abs(hash) % colors.length];
   }
@@ -115,6 +134,118 @@ export default function Notification({ selectedProjectId }) {
     }
   };
 
+  const fetchProjectMembers = async (projectId) => {
+    // const token = cookies.get('token');  
+    try {
+      if (!projectId) {
+        toast.error('No project selected');
+        return;
+      }
+      const token = cookies.get('token');
+      if (!token) {
+        toast.error('You must be logged in to send invitations');
+        return;
+      }
+      const response = await axios.get(`http://localhost:5000/api/projects/${projectId}/members`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+      console.log('Fetched project members:', response.data.data);
+      setProjectMembers(response.data.data || []);
+      // return response.data.data || [];
+    } catch (error) {
+      console.error('Error fetching project members:', error);
+      toast.error('Error fetching project members');
+    }
+  };
+  // Fetch invitations for the current user
+  const fetchInvitations = async () => {
+    const token = cookies.get('token');
+    if (!token) return;
+    try {
+      const response = await axios.get('http://localhost:5000/api/invitations', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      console.log('Fetched invitations:', response.data.data);
+      setInvitations(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching invitations:', error);
+    }
+  };
+
+  const handleAcceptInvitation = async (invitationId) => {
+    const token = cookies.get('token');
+    if (!token) return;
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/invitations/accept',
+        { invitationId },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        }
+      )
+      if (response.status === 200) {
+        toast.success('Invitation accepted successfully!');
+        setInvitations(prev => prev.filter(invite => invite._id !== invitationId));
+      }
+      else {
+        toast.error('Failed to accept invitation');
+      }
+    }
+    catch (error) {
+      console.error('Error accepting invitation:', error);
+      const errorMsg = error.response?.data?.message || 'Error accepting invitation';
+      toast.error(errorMsg);
+    }
+
+  }
+
+  const handleDecliceInvitation = async (invitationId) => {
+    const token = cookies.get('token');
+    if (!token) return;
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/invitations/decline',
+        { invitationId },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        }
+      )
+      if (response.status === 200) {
+        toast.success('Invitation declined successfully!');
+        setInvitations(prev => prev.filter(invite => invite._id !== invitationId));
+      }
+      else {
+        toast.error('Failed to decline invitation');
+      }
+    }
+    catch (error) {
+      console.error('Error accepting invitation:', error);
+      const errorMsg = error.response?.data?.message || 'Error accepting invitation';
+      toast.error(errorMsg);
+    }
+
+  }
+
+  const handleRefresh = () => {
+    if (activeTab === "my-invitation") {
+      fetchInvitations(); 
+    }
+    else if (activeTab === "team-member") {
+      fetchProjectMembers(selectedProjectId); 
+    }
+  }
+
+
+
   return (
     <div className="notification-container">
       <div className="invitation-container">
@@ -123,9 +254,12 @@ export default function Notification({ selectedProjectId }) {
 
             <button
               className={activeTab === "my-invitation" ? "active" : ""}
-              onClick={() => setActiveTab("my-invitation")}
+              onClick={() => {
+                fetchInvitations(); // Fetch invitations when this tab is clicked
+                setActiveTab("my-invitation")
+              }}
             >
-              My Invitation
+              My Invitations
             </button>
             <button
               className={activeTab === "invite" ? "active" : ""}
@@ -135,65 +269,42 @@ export default function Notification({ selectedProjectId }) {
             </button>
             <button
               className={activeTab === "team-member" ? "active" : ""}
-              onClick={() => setActiveTab("team-member")}
+              onClick={() => {setActiveTab("team-member") , fetchProjectMembers(selectedProjectId)}}
             >
-              Team Member
+              Team Members
             </button>
           </div>
           <div className="refresh-button">
             <TbRefresh
               className="refresh-icon"
               onClick={() => {
-                // Add your refresh logic here
-                console.log("Refresh clicked");
+                handleRefresh(); // Refresh invitations or project members based on active tab
               }}
             />
           </div>
         </div>
 
         <div className="invitation-content">
-          {activeTab === "my-invitation" && <div className="invitations">
-            <div className="invitation-item">
-              <div className="invitation-details">
-                <h2>Project Name</h2>
-                <p>Manager : Someone</p>
-              </div>
-              <div className="invitation-actions">
-                <button className="accept-button">Accept</button>
-                <button className="decline-button">Decline</button>
-              </div>
+          {activeTab === "my-invitation" && (
+            <div className="invitations">
+              {Invitations.length > 0 ? (
+                Invitations.map(invite => (
+                  <div className="invitation-item" key={invite._id}>
+                    <div className="invitation-details">
+                      <h2>{invite.projectId?.name || 'Project'}</h2>
+                      <p>Manager : {invite.projectId?.manager?.name || 'Unknown'}</p>
+                    </div>
+                    <div className="invitation-actions">
+                      <button className="accept-button" onClick={() => handleAcceptInvitation(invite._id)}>Accept</button>
+                      <button className="decline-button" onClick={() => handleDecliceInvitation(invite._id)}>Decline</button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div>No invitations found</div>
+              )}
             </div>
-            <div className="invitation-item">
-              <div className="invitation-details">
-                <h2>Project Name</h2>
-                <p>Manager : Someone</p>
-              </div>
-              <div className="invitation-actions">
-                <button className="accept-button">Accept</button>
-                <button className="decline-button">Decline</button>
-              </div>
-            </div>
-            <div className="invitation-item">
-              <div className="invitation-details">
-                <h2>Project Name</h2>
-                <p>Manager : Someone</p>
-              </div>
-              <div className="invitation-actions">
-                <button className="accept-button">Accept</button>
-                <button className="decline-button">Decline</button>
-              </div>
-            </div>
-            <div className="invitation-item">
-              <div className="invitation-details">
-                <h2>Project Name</h2>
-                <p>Manager : Someone</p>
-              </div>
-              <div className="invitation-actions">
-                <button className="accept-button">Accept</button>
-                <button className="decline-button">Decline</button>
-              </div>
-            </div>
-          </div>}
+          )}
           {activeTab === "invite" && <div className="invite-container" style={{ padding: '20px' }}>
             <div className="search-bar-container" style={{ marginBottom: '20px' }}>
               <input
@@ -221,7 +332,7 @@ export default function Notification({ selectedProjectId }) {
                       className={`search-result-item${selectedUsers.some(selected => selected.name === user.name) ? ' selected' : ''}`}
                       onClick={() => handleUserSelect(user)}
                     >
-                      <div className="user-avatar" style={{ backgroundColor: getColor(user.name) }}>
+                      <div className="user-avatar" style={{ backgroundColor: getColor(user.name)  , color: 'black' }}>
                         {user.name[0]}
                       </div>
                       <div className="user-name">{user.name}</div>
@@ -234,6 +345,7 @@ export default function Notification({ selectedProjectId }) {
                 )}
               </div>
             )}
+
 
             {/* Selected Users List */}
             <div className="selected-users">
@@ -277,7 +389,27 @@ export default function Notification({ selectedProjectId }) {
             </button>
           </div>
           }
-          {activeTab === "team-member" && <div>Team members list...</div>}
+          {activeTab === "team-member" && <div className="team-member-container">
+            <h2>Project Members</h2>
+            {projectMembers.length > 0 ? (
+              <div className="project-members-list">
+                {projectMembers.map(member => (
+                  <div className="project-member-item" key={member.userId}>
+                    <div className="member-avatar" style={{ backgroundColor: getColor(member.name) , color: 'black' }}>
+                      {member.name[0]}
+                    </div>
+                    <div className="member-details">
+                      <h3>{member.name}</h3>
+                      {/* <p>{member.email}</p> */}
+                      <p className={`role${(member.role === 'manager') ? ' manager' : ''}`}>{member.role}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div>No members in this project</div>
+            )}
+          </div>}
         </div>
       </div>
 

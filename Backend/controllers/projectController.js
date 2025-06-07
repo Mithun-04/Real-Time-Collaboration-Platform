@@ -98,9 +98,31 @@ const inviteMembers = async (req, res) => {
     }
 };
 
+const getProjectMembers = async (req, res) => {
+    try {
+        // Accept projectId from req.body.projectId or req.query.projectId or req.params.id
+        let projectId =  req.params.id;
+        if (!projectId) {
+            throw new Error('Project ID is required');
+        }
+        const members = await projectService.getProjectMembers(projectId);
+        res.status(200).json({
+            success: true,
+            data: members,
+            message: 'Project members retrieved successfully',
+        });
+    } catch (error) {
+        res.status(error.message === 'Project not found' || error.message === 'Unauthorized' ? 404 : 500).json({
+            success: false,
+            message: error.message || 'Failed to retrieve project members',
+        });
+    }
+};
+
 export default {
     createProject,
     getProjects,
     getProjectById,
-    inviteMembers
+    inviteMembers,
+    getProjectMembers
 };

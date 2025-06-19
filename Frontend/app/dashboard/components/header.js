@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Cookies from 'universal-cookie';
+import { TbRefresh } from "react-icons/tb";
 import '../styles/header.css';
 import { IoNotificationsOutline } from "react-icons/io5";
 
@@ -19,6 +20,9 @@ export default function Header({ onAddProject, selectedProject, onRefresh }) {
                 Hi, {username || "User"}
             </div>
             <div className="content-container">
+                <div className='refresh-icon'>
+                    <TbRefresh className='refresh-icon' onClick={onRefresh} />
+                </div>  
                 <button className="add-proj" onClick={onAddProject}>
                     {selectedProject || "Select a Project"}
                 </button>

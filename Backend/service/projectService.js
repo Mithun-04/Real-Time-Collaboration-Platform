@@ -1,7 +1,10 @@
 import User from "../models/User.js";
 import Project from "../models/Project.js";
 import Invitation from "../models/Invitation.js";
+import Message from "../models/Message.js";
+
 import mongoose from "mongoose";
+import { memo } from "react";
 
 const createProject = async ({ name, description, managerId }) => {
 
@@ -40,7 +43,6 @@ const createProject = async ({ name, description, managerId }) => {
 }
 
 const getProjects = async (userId) => {
-    console.log('Fetching projects for userId:', userId); // Log the userId
 
     const projects = await Project.find({
         $or: [
@@ -145,9 +147,6 @@ const inviteMembersToProject = async (projectId, managerId, invitations) => {
             throw { status: 400, message: `User with username ${invitation.name} is already a member of this project` };
         }
 
-        console.log('Existing Invitation:', existingInvitation); // Log existing invitation for debugging
-        console.log('Is Already Member:', isAlreadyMember); // Log membership status for debugging
-
         if (!existingInvitation && !isAlreadyMember) {
             invitationDocs.push({
                 projectId: projectObjectId,
@@ -169,9 +168,8 @@ const getProjectMembers = async (projectId) => {
     try {
         const project = await Project.findById(projectId).populate('members.userId', 'name email');
         if (!project) {
-            throw {status : 400 , meassage : 'Project not found'};
+            throw { status: 400, meassage: 'Project not found' };
         }
-        console.log('Project Members:', project.members); 
         return project.members.map(member => ({
             userId: member.userId._id,
             name: member.userId.name,
@@ -180,10 +178,55 @@ const getProjectMembers = async (projectId) => {
         }));
     }
     catch (error) {
-        throw { status : error.status || 500 , message:'Failed to retrieve project members' };
+        throw { status: error.status || 500, message: 'Failed to retrieve project members' };
     }
 };
 
+
+const addMessageToProject = async (projectId, senderId, content) => {
+    try {
+        const project = await Project.findById(projectId);
+        console.log(project);
+
+        if (!project) {
+            throw { status: 404, message: 'Project not found' };
+        }
+        if (!project.members.some(member => member.userId.toString() === senderId)) {
+            throw { status: 400, message: 'User is not a member of this project' };
+        }
+
+        const createdMsg = await Message.create({
+            projectId: project._id,
+            senderId: senderId,
+            content: content
+        });
+
+        // Populate senderId with name and email
+        const res = await Message.findById(createdMsg._id).populate('senderId', 'name email');
+        return res;
+    }
+    catch (error) {
+        throw { status: error.status || 500, message: error.message || 'Failed to add message to project' };
+    }
+};
+
+
+const getMessages = async (projectId) => {
+    try {
+        const exsist = await Project.findById(projectId);
+        if (!exsist) {
+            throw { status: 404, message: "No Project is Found" };
+        }
+        const messages = await Message.find({ projectId }).populate('senderId', 'name email').sort({ createdAt: 1 }).lean();
+        return messages;
+    }
+    catch (error) {
+        res.status(500).json({
+            status: false,
+            meassage: error.message || "Error in fetching the Messages"
+        })
+    }
+}
 
 
 export default {
@@ -191,5 +234,7 @@ export default {
     getProjects,
     getProjectDetails,
     inviteMembersToProject,
-    getProjectMembers
+    getProjectMembers,
+    addMessageToProject,
+    getMessages
 }

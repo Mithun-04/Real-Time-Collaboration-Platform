@@ -1,8 +1,15 @@
 import { BarChart } from '@mui/x-charts/BarChart';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import '../styles/reports.css';
+import { forwardRef, useImperativeHandle } from 'react';
 
-export default function Reports() {
+const Reports = forwardRef(function Reports(props, ref) {
+    useImperativeHandle(ref, () => ({
+        refreshReports: () => {
+            // If reports become dynamic, add refresh logic here
+        }
+    }));
+
     const pData = [5, 6, 4];
     const xLabels = [
         'To Do',
@@ -114,4 +121,6 @@ export default function Reports() {
             </div>
         </div>
     )
-}
+});
+
+export default Reports;

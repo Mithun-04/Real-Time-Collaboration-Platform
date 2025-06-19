@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Project from "./components/project";
 import SideBar from "./components/sideBar";
 import Header from "./components/header";
@@ -13,12 +13,6 @@ import './styles/dashboard.css';
 import Reports from "./components/reports";
 import Tasks from "./components/tasks";
 import Notification from "./components/notification";
-import { set } from "mongoose";
-
-
-
-
-
 
 export default function Dashboard() {
 
@@ -35,6 +29,10 @@ export default function Dashboard() {
     const [selectedProject, setSelectedProject] = useState('');
     const [loading, setLoading] = useState(true);
     const [activeSection , setActiveSection] = useState("reports");
+
+    const tasksRef = useRef();
+    const notificationRef = useRef();
+    const reportsRef = useRef();
 
     const handleSectionChange = (section) => {
         setActiveSection(section);
@@ -78,14 +76,30 @@ export default function Dashboard() {
         // setShowProject(true);
     }, []);
 
+    const onRefreshActiveSession = () => {
+        if (!selectedProject) {
+            toast.error("No project selected");
+            return;
+        }
+        if (activeSection === "tasks" && tasksRef.current) {
+            tasksRef.current.refreshTasks && tasksRef.current.refreshTasks();
+        } else if (activeSection === "notification" && notificationRef.current) {
+            notificationRef.current.refreshNotifications && notificationRef.current.refreshNotifications();
+        } else if (activeSection === "reports" && reportsRef.current) {
+            reportsRef.current.refreshReports && reportsRef.current.refreshReports();
+        } else {
+            toast("Nothing to refresh for this section");
+        }
+    };
+
     return (
         <div className="dashboard">
             <SideBar onNavigate={handleSectionChange} />
             <div className="dashboard-content">
-                <Header onAddProject={() => { setShowProject(true) }} selectedProject={selectedProject} />
-                {activeSection === "reports" && <Reports />}
-                {activeSection === "tasks" && <Tasks />}
-                {activeSection === "notification" && <Notification selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''} />}
+                <Header onAddProject={() => { setShowProject(true) }} selectedProject={selectedProject} onRefresh={onRefreshActiveSession} />
+                {activeSection === "reports" && <Reports ref={reportsRef} />}
+                {activeSection === "tasks" && <Tasks ref={tasksRef} selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''}/>}
+                {activeSection === "notification" && <Notification ref={notificationRef} selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''} />}
             </div>
 
             {showProject && (

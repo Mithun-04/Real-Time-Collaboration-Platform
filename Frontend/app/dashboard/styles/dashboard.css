@@ -1,6 +1,7 @@
 .dashboard {
     display: flex;
     flex-direction: row;
+    overflow: hidden;
     width: 100vw;
     height: 100vh;
 
@@ -8,9 +9,11 @@
 
 .dashboard-content {
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
     position: relative;
+    height: 100%;
     padding: 1rem;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
 }

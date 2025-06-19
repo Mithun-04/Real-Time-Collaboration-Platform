@@ -1,24 +1,33 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import "../styles/notification.css";
 import { TbRefresh } from "react-icons/tb";
+import { Cookie, Send } from 'lucide-react';
 import Cookies from "universal-cookie";
+import { format } from "timeago.js";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-export default function Notification({ selectedProjectId }) {
-
+const Notification = forwardRef(function Notification({ selectedProjectId }, ref) {
   const [activeTab, setActiveTab] = useState("my-invitation");
+  const [messageContent, setmesssageContent] = useState("");
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [Invitations, setInvitations] = useState([]);
   const [projectMembers, setProjectMembers] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const scrollRef = useRef();
+
 
   const cookies = new Cookies();
 
   useEffect(() => {
     fetchInvitations();// Fetch invitations when component mounts
   }, []);
+
+  useEffect(() =>{
+    scrollRef.current?.scrollIntoView({behavior : "smooth"});
+  },[messages]);
 
   useEffect(() => {
     setSearchResults([]);
@@ -29,6 +38,7 @@ export default function Notification({ selectedProjectId }) {
   useEffect(() => {
     if (selectedProjectId) {
       fetchProjectMembers(selectedProjectId);
+      fetchMessages(selectedProjectId);
     }
   }, [selectedProjectId]);
 
@@ -74,6 +84,20 @@ export default function Notification({ selectedProjectId }) {
     } catch (error) {
       console.error('Error searching users:', error);
       setSearchResults([]);
+    }
+  };
+  const fetchMessages = async (projectId) => {
+    if (!projectId) return;
+    const token = cookies.get('token');
+    if (!token) return;
+    try {
+      const response = await axios.get(`http://localhost:5000/api/projects/conversation/${projectId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setMessages(response.data.messages || []);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      toast.error('Error fetching messages');
     }
   };
 
@@ -237,14 +261,38 @@ export default function Notification({ selectedProjectId }) {
 
   const handleRefresh = () => {
     if (activeTab === "my-invitation") {
-      fetchInvitations(); 
+      fetchInvitations();
     }
     else if (activeTab === "team-member") {
-      fetchProjectMembers(selectedProjectId); 
+      fetchProjectMembers(selectedProjectId);
     }
   }
+  const handleSend = async (projectId) => {
+    try {
+      if (!projectId) return;
+      const token = cookies.get('token');
+      if (!token) return;
+      const response = await axios.post(`http://localhost:5000/api/projects/conversation/${projectId}`, {
+        content: messageContent
+      }, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.status) {
+        setmesssageContent('');
+        setMessages([...messages , response.data?.data || []]);
+      }
+    } catch (error) {
+      console.error('Error Sending messages:', error);
+      toast.error('Error Sending messages');
+    }
 
-
+  }
+  useImperativeHandle(ref, () => ({
+    refreshNotifications: () => {
+      fetchInvitations();
+      fetchMessages(selectedProjectId);
+    }
+  }));
 
   return (
     <div className="notification-container">
@@ -269,7 +317,7 @@ export default function Notification({ selectedProjectId }) {
             </button>
             <button
               className={activeTab === "team-member" ? "active" : ""}
-              onClick={() => {setActiveTab("team-member") , fetchProjectMembers(selectedProjectId)}}
+              onClick={() => { setActiveTab("team-member"), fetchProjectMembers(selectedProjectId) }}
             >
               Team Members
             </button>
@@ -332,7 +380,7 @@ export default function Notification({ selectedProjectId }) {
                       className={`search-result-item${selectedUsers.some(selected => selected.name === user.name) ? ' selected' : ''}`}
                       onClick={() => handleUserSelect(user)}
                     >
-                      <div className="user-avatar" style={{ backgroundColor: getColor(user.name)  , color: 'black' }}>
+                      <div className="user-avatar" style={{ backgroundColor: getColor(user.name), color: 'black' }}>
                         {user.name[0]}
                       </div>
                       <div className="user-name">{user.name}</div>
@@ -395,7 +443,7 @@ export default function Notification({ selectedProjectId }) {
               <div className="project-members-list">
                 {projectMembers.map(member => (
                   <div className="project-member-item" key={member.userId}>
-                    <div className="member-avatar" style={{ backgroundColor: getColor(member.name) , color: 'black' }}>
+                    <div className="member-avatar" style={{ backgroundColor: getColor(member.name), color: 'black' }}>
                       {member.name[0]}
                     </div>
                     <div className="member-details">
@@ -414,8 +462,40 @@ export default function Notification({ selectedProjectId }) {
       </div>
 
       <div className="meassage-container">
-        {/* You can add conditional messaging UI here too */}
+        <div className="message-header">
+          <h2>Messages</h2>
+        </div>
+        <div className="message-content">
+          {messages.length > 0 ? (
+            messages.map((msg) => (
+              <div className={`message-item${msg.senderId?.name === cookies.get('user')?.name ? ' own' : ''}`} key={msg._id} ref = {scrollRef}>
+                <div className="message-top">
+                  <div className="message-avatar" style={{ backgroundColor: getColor(msg.senderId?.name || '?'), color: 'black' }}>
+                    {msg.senderId?.name ? msg.senderId.name[0] : '?'}
+                  </div>
+                  <div className="message-details">
+                    <div className="message-sender">{msg.senderId?.name === cookies.get("user")?.name ? 'You' : msg.senderId?.name}</div>
+                    <div className="message-text">{msg.content}</div>
+                  </div>
+                </div>
+                <div className="message-bottom">
+                  <span className="message-time">{format(msg.createdAt)}</span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div>No messages found</div>
+          )}
+        </div>
+        <div className="message-footer">
+          <textarea type="text" placeholder="Type your message here..." className="message-input" value={messageContent} onChange={e => { setmesssageContent(e.target.value) }} />
+          <button className="send-button" onClick={() => { handleSend(selectedProjectId) }}>
+              Send
+          </button>
+        </div>
       </div>
     </div>
   );
-}
+});
+
+export default Notification;

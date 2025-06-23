@@ -1,11 +1,13 @@
-import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle, use } from "react";
 import "../styles/notification.css";
 import { TbRefresh } from "react-icons/tb";
-import { Cookie, Send } from 'lucide-react';
 import Cookies from "universal-cookie";
 import { format } from "timeago.js";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { io } from "socket.io-client";
+
+
 
 const Notification = forwardRef(function Notification({ selectedProjectId }, ref) {
   const [activeTab, setActiveTab] = useState("my-invitation");
@@ -16,18 +18,36 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
   const [Invitations, setInvitations] = useState([]);
   const [projectMembers, setProjectMembers] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [arrivalMessage, setArrivalMessage] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const scrollRef = useRef();
+  const socketRef = useRef();
 
 
   const cookies = new Cookies();
+  const user = cookies.get("user");
 
   useEffect(() => {
-    fetchInvitations();// Fetch invitations when component mounts
-  }, []);
+    socketRef.current = io("ws://localhost:4000");
+    socketRef.current.on("receiveMessage", ({ message }) => {
+      console.log("New message:", message);
+      setArrivalMessage(message);
+    });
 
-  useEffect(() =>{
-    scrollRef.current?.scrollIntoView({behavior : "smooth"});
-  },[messages]);
+    return () => {
+      socketRef.current.disconnect(selectedProjectId);
+      if (selectedProjectId && socketRef.current) {
+        socketRef.current.emit("leaveProject", {
+          projectId: selectedProjectId
+        });
+      }
+    };
+  }, []); // Only run once on mount
+
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   useEffect(() => {
     setSearchResults([]);
@@ -36,11 +56,35 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
   }, [activeTab]);
 
   useEffect(() => {
+    console.log(onlineUsers);
+  }, [onlineUsers])
+  useEffect(() => {
     if (selectedProjectId) {
+      socketRef.current.emit("joinProject", selectedProjectId, user.name);
+      socketRef.current.on("onlineUsers", (users) => {
+        setOnlineUsers(users);
+      })
       fetchProjectMembers(selectedProjectId);
       fetchMessages(selectedProjectId);
     }
   }, [selectedProjectId]);
+  useEffect(() => {
+    return () => {
+      if (selectedProjectId && socketRef.current) {
+        socketRef.current.emit("leaveProject", {
+          projectId: selectedProjectId
+        });
+      }
+    };
+  }, [selectedProjectId]);
+
+
+
+
+  useEffect(() => {
+    console.log("Arrival Message : ", arrivalMessage);
+    arrivalMessage && setMessages([...messages, arrivalMessage])
+  }, [arrivalMessage])
 
   const colors = [
     '#FFB6C1', // Light Pink
@@ -279,7 +323,10 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
       });
       if (response.status) {
         setmesssageContent('');
-        setMessages([...messages , response.data?.data || []]);
+        socketRef.current.emit("sendMessage", {
+          projectId: selectedProjectId,
+          message: response.data?.data || []
+        })
       }
     } catch (error) {
       console.error('Error Sending messages:', error);
@@ -464,11 +511,25 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
       <div className="meassage-container">
         <div className="message-header">
           <h2>Messages</h2>
+          <div className="online-members-container">
+            <div className="online-avatar" style={{ backgroundColor: getColor("Mark"), color: 'black' }}>
+              M
+            </div>
+            <div className="online-avatar" style={{ backgroundColor: getColor("Jack"), color: 'black' }}>
+              J
+            </div>
+            <div className="online-avatar" style={{ backgroundColor: getColor("Steven"), color: 'black' }}>
+              S
+            </div>
+            <div className="online-avatar" style={{ backgroundColor: getColor("Hari"), color: 'black' }}>
+              H
+            </div>
+          </div>
         </div>
         <div className="message-content">
           {messages.length > 0 ? (
             messages.map((msg) => (
-              <div className={`message-item${msg.senderId?.name === cookies.get('user')?.name ? ' own' : ''}`} key={msg._id} ref = {scrollRef}>
+              <div className={`message-item${msg.senderId?.name === cookies.get('user')?.name ? ' own' : ''}`} key={msg._id} ref={scrollRef}>
                 <div className="message-top">
                   <div className="message-avatar" style={{ backgroundColor: getColor(msg.senderId?.name || '?'), color: 'black' }}>
                     {msg.senderId?.name ? msg.senderId.name[0] : '?'}
@@ -490,7 +551,7 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
         <div className="message-footer">
           <textarea type="text" placeholder="Type your message here..." className="message-input" value={messageContent} onChange={e => { setmesssageContent(e.target.value) }} />
           <button className="send-button" onClick={() => { handleSend(selectedProjectId) }}>
-              Send
+            Send
           </button>
         </div>
       </div>

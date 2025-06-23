@@ -320,7 +320,30 @@
   width: 100%;
   margin-bottom: 1rem;
   border-bottom: 1px solid #6b6262;
+  align-items: center;
   justify-content: space-between;
+}
+
+.online-members-container{
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.online-avatar{
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: -10px;
+  background: #ccc;
+}
+
+.online-members-container .online-avatar:first-child {
+  margin-left: 0;
 }
 .message-header h2 {
   font-size: 1.2rem;

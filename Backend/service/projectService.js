@@ -186,7 +186,7 @@ const getProjectMembers = async (projectId) => {
 const addMessageToProject = async (projectId, senderId, content) => {
     try {
         const project = await Project.findById(projectId);
-        console.log(project);
+        // console.log(project);
 
         if (!project) {
             throw { status: 404, message: 'Project not found' };

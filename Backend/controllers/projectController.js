@@ -150,6 +150,9 @@ const addMessagetoProject = async (req, res) => {
         const projectId = req.params.projectId;
         const senderId = req.user.id;
 
+        console.log("projectId : ", projectId) 
+        console.log("content : ", content) 
+
         if (!projectId || !content) {
             return res.status(400).json({
                 success: false,

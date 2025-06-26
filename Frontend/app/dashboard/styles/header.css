@@ -5,6 +5,7 @@
     justify-items: center;
     justify-content: space-between;
     width: 85vw;
+    z-index: 805;
 }
 
 .header-title{

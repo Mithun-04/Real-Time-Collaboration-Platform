@@ -14,6 +14,10 @@ router.post('/', authMiddleware, projectController.createProject);
 router.get('/', authMiddleware, projectController.getProjects);
 router.get('/:id', authMiddleware, projectController.getProjectById);
 router.post('/:id/invite', authMiddleware, projectController.inviteMembers);
+router.get('/:id/members', authMiddleware, projectController.getProjectMembers);
+router.post('/conversation/:projectId' , authMiddleware , projectController.addMessagetoProject)
+router.get('/conversation/:projectId' , authMiddleware , projectController.getMessages)
+
 
 
 export default router;

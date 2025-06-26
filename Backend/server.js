@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import invitationRoutes from './routes/invitationRoutes.js';
+import taskRoutes from './routes/taskRoutes.js';
 
 const app = express();
 dotenv.config();
@@ -33,3 +36,6 @@ app.listen(PORT, () => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/invitations', invitationRoutes);
+app.use('/api/tasks', taskRoutes);

@@ -1,4 +1,6 @@
+import { Component } from "react";
 import projectService from "../service/projectService.js"
+
 
 const createProject = async (req, res) => {
 
@@ -88,13 +90,114 @@ const inviteMembers = async (req, res) => {
             message: 'Invitations sent successfully',
         });
     } catch (error) {
-        res.status(
-            error.message === 'Project not found' || error.message === 'Unauthorized' || error.message.includes('Request body')
-                ? 400
-                : 500
-        ).json({
+        const status = error.status || 500;
+        const message = error.message || 'Failed to send invitations';
+        res.status(status).json({
             success: false,
-            message: error.message || 'Failed to send invitations',
+            message,
+        });
+    }
+};
+
+const getProjectMembers = async (req, res) => {
+    try {
+        // Accept projectId from req.body.projectId or req.query.projectId or req.params.id
+        let projectId = req.params.id;
+        if (!projectId) {
+            throw new Error('Project ID is required');
+        }
+        const members = await projectService.getProjectMembers(projectId);
+        res.status(200).json({
+            success: true,
+            data: members,
+            message: 'Project members retrieved successfully',
+        });
+    } catch (error) {
+        res.status(error.message === 'Project not found' || error.message === 'Unauthorized' ? 404 : 500).json({
+            success: false,
+            message: error.message || 'Failed to retrieve project members',
+        });
+    }
+};
+
+const searchProjectUsers = async (req, res) => {
+    try {
+        const { projectID } = req.body;
+        const userId = req.user.id;
+        if (!projectID) {
+            return res.status(400).json({
+                success: false,
+                message: 'Project ID is required',
+            });
+        }
+        const users = await projectService.searchProjectUsers(projectID, userId);
+        res.status(200).json({
+            success: true,
+            data: users,
+            message: 'Users retrieved successfully',
+        });
+    } catch (error) {
+        res.status(error.message === 'Project not found' || error.message === 'Unauthorized' ? 404 : 500).json({
+            success: false,
+            message: error.message || 'Failed to retrieve users',
+        });
+    }
+};
+
+const addMessagetoProject = async (req, res) => {
+    try {
+        const { content } = req.body;
+        const projectId = req.params.projectId;
+        const senderId = req.user.id;
+
+        console.log("projectId : ", projectId) 
+        console.log("content : ", content) 
+
+        if (!projectId || !content) {
+            return res.status(400).json({
+                success: false,
+                message: 'Project ID and content are required',
+            });
+        }
+        const message = await projectService.addMessageToProject(projectId, senderId, content);
+        res.status(200).json({
+            success: true,
+            data: message,
+            message: 'Message added to project successfully',
+        });
+    }
+    catch (error) {
+        res.status(error.message === 'Project not found' || error.message === 'Unauthorized' ? 404 : 500).json({
+            success: false,
+            message: error.message || 'Failed to add message to project',
+        });
+    }
+};
+
+
+const getMessages = async (req, res) => {
+
+    try {
+        const projectId = req.params.projectId;
+
+        if (!projectId) {
+            return res.status(400).json({
+                status: false,
+                message: "ProjectId is not Provided"
+            })
+        }
+
+        const response = await projectService.getMessages(projectId);
+
+        res.status(200).json({
+            succes: true,
+            messages: response
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to retrieve messages',
         });
     }
 };
@@ -103,5 +206,8 @@ export default {
     createProject,
     getProjects,
     getProjectById,
-    inviteMembers
+    inviteMembers,
+    getProjectMembers,
+    addMessagetoProject,
+    getMessages
 };

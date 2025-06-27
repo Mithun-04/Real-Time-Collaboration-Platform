@@ -97,7 +97,7 @@ export default function Dashboard() {
             <SideBar onNavigate={handleSectionChange} />
             <div className="dashboard-content">
                 <Header onAddProject={() => { setShowProject(true) }} selectedProject={selectedProject} onRefresh={onRefreshActiveSession} />
-                {activeSection === "reports" && <Reports ref={reportsRef} />}
+                {activeSection === "reports" && <Reports ref={reportsRef} selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''} />}
                 {activeSection === "tasks" && <Tasks ref={tasksRef} selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''}/>}
                 {activeSection === "notification" && <Notification ref={notificationRef} selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''} />}
             </div>

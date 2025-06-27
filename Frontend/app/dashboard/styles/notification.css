@@ -330,21 +330,6 @@
   margin-bottom: 10px;
   cursor: pointer;
 }
-
-.online-avatar{
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: -10px;
-  background: #ccc;
-}
-
-.online-members-container .online-avatar:first-child {
-  margin-left: 0;
-}
 .message-header h2 {
   font-size: 1.2rem;
   color: #f4f1f1;
@@ -471,4 +456,66 @@
 
   .send-button:hover {
     background-color: #c72c50;
+}
+
+
+.online-members-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.online-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff; /* White text for visibility */
+}
+
+.online-members-container .online-avatar:first-child {
+  margin-left: 0;
+}
+.extra-users {
+  background-color: #444; /* Darker gray for extra users */
+  color: #fff;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #151515; /* Dark dropdown background */
+  border: 1px solid #444;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  min-width: 150px;
+  max-height: 190px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 5px;
+}
+
+.dropdown-item {
+  padding: 8px 12px;  
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  border-bottom: 1px solid #3a3a3a;
+  color: #fff; /* White text for visibility */
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background-color: #1a1a1a; /* Slightly lighter dark on hover */
 }

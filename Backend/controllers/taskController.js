@@ -23,9 +23,6 @@ export const getProjectTasks = async (req, res) => {
         const projectId = req.params.projectId;
         const userId = req.user.id;
 
-        // console.log("projectId", projectId);
-        // console.log("userId", userId);
-
         const tasks = await taskService.getProjectTasks(projectId, userId);
         res.json({
             success: true,
@@ -40,6 +37,24 @@ export const getProjectTasks = async (req, res) => {
     }
 };
 
+export const getAllTasks = async ( req, res) =>{
+    try{
+        const projectId = req.params.projectId;
+
+        const response = await taskService.getAllTasks(projectId);
+
+        res.status(201).json({
+            status : true,
+            data : response,
+        })
+    }
+    catch(error){
+        res.status(400).json({
+            status : false,
+            error : error.message
+        })
+    }
+}
 // Get All Tasks Assigned to Logged-in User
 export const getUserTasks = async (req, res) => {
     try {

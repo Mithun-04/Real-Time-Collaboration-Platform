@@ -20,12 +20,22 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
   const [messages, setMessages] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
   const scrollRef = useRef();
   const socketRef = useRef();
+
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const maxAvatars = 4;
+  const extraUsers = onlineUsers.length > maxAvatars ? onlineUsers.length - maxAvatars : 0;
+
 
 
   const cookies = new Cookies();
   const user = cookies.get("user");
+
 
   useEffect(() => {
     socketRef.current = io("ws://localhost:4000");
@@ -50,6 +60,17 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
   }, [messages]);
 
   useEffect(() => {
+    let timer;
+    if (showDropdown) {
+      timer = setTimeout(() => {
+        setShowDropdown(false);
+      }, 10000); // 10 seconds
+    }
+    return () => clearTimeout(timer); // Cleanup timer on unmount or state change
+  }, [showDropdown]);
+
+  
+  useEffect(() => {
     setSearchResults([]);
     setSearchQuery('');
     setSelectedUsers([]);
@@ -62,7 +83,8 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
     if (selectedProjectId) {
       socketRef.current.emit("joinProject", selectedProjectId, user.name);
       socketRef.current.on("onlineUsers", (users) => {
-        setOnlineUsers(users);
+        const uniqueUsers = Array.from(new Set(users));
+        setOnlineUsers(uniqueUsers);
       })
       fetchProjectMembers(selectedProjectId);
       fetchMessages(selectedProjectId);
@@ -511,21 +533,42 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
       <div className="meassage-container">
         <div className="message-header">
           <h2>Messages</h2>
-          <div className="online-members-container">
-            <div className="online-avatar" style={{ backgroundColor: getColor("Mark"), color: 'black' }}>
-              M
-            </div>
-            <div className="online-avatar" style={{ backgroundColor: getColor("Jack"), color: 'black' }}>
-              J
-            </div>
-            <div className="online-avatar" style={{ backgroundColor: getColor("Steven"), color: 'black' }}>
-              S
-            </div>
-            <div className="online-avatar" style={{ backgroundColor: getColor("Hari"), color: 'black' }}>
-              H
-            </div>
+          <div className="online-members-container" onClick={toggleDropdown}>
+            {onlineUsers.length > 0 ? (
+              <>
+                {onlineUsers.slice(0, maxAvatars).map((msg) => (
+                  <div
+                    className="online-avatar"
+                    key={msg}
+                    style={{ backgroundColor: getColor(msg), color: 'black' }}
+                  >
+                    {msg[0]}
+                  </div>
+                ))}
+                {extraUsers > 0 && (
+                  <div className="online-avatar extra-users">+{extraUsers}</div>
+                )}
+              </>
+            ) : (
+              <div></div>
+            )}
+            {showDropdown && onlineUsers.length > 0 && (
+              <div className="dropdown">
+                {onlineUsers.map((user) => (
+                  <div key={user} className="dropdown-item">
+                    <div className="online-avatar" style={{ backgroundColor: getColor(user), color: 'black' }}>
+                      {user[0]}
+                    </div>
+                    <div className="member-details">
+                      <h3>{user}</h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
+
         <div className="message-content">
           {messages.length > 0 ? (
             messages.map((msg) => (
@@ -555,7 +598,7 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
           </button>
         </div>
       </div>
-    </div>
+    </div >
   );
 });
 

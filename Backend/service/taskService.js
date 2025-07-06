@@ -9,7 +9,6 @@ const createTask = async ({ title, description, projectId, assignedTo, priority,
         throw new Error("Invalid project ID");
     }
 
-    // Fetch the project to check if the user is the manager
     const project = await Project.findById(projectId);
     if (!project) {
         throw new Error("Project not found");
@@ -70,7 +69,8 @@ const getUserTasks = async (userId) => {
         throw new Error("Invalid user ID");
     }
 
-    return await Task.find({ assignedTo: userId });
+    return await Task.find({ assignedTo: userId })
+        .populate("assignedTo", "name email");
 };
 
 const updateTask = async (taskId, userId, updateData) => {

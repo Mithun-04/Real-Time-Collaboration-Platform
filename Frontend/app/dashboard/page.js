@@ -16,23 +16,30 @@ import Notification from "./components/notification";
 
 export default function Dashboard() {
 
-        const pData = [5, 6, 4];
-        const xLabels = [
-            'To Do',
-            'Doing',
-            'Done',
-        ];
+    const pData = [5, 6, 4];
+    const xLabels = [
+        'To Do',
+        'Doing',
+        'Done',
+    ];
 
     const [showAddProject, setShowAddProject] = useState(false);
     const [showProject, setShowProject] = useState(false);
     const [projects, setProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState('');
     const [loading, setLoading] = useState(true);
-    const [activeSection , setActiveSection] = useState("reports");
+    const [activeSection, setActiveSection] = useState("reports");
+    const [isYourself, setIsYourself] = useState(false);
+
 
     const tasksRef = useRef();
     const notificationRef = useRef();
     const reportsRef = useRef();
+
+    const toggleDropdown = (e) => {
+        e.stopPropagation(); // Prevent triggering onRefresh
+        setIsYourself(!isYourself);
+    };
 
     const handleSectionChange = (section) => {
         setActiveSection(section);
@@ -96,9 +103,9 @@ export default function Dashboard() {
         <div className="dashboard">
             <SideBar onNavigate={handleSectionChange} />
             <div className="dashboard-content">
-                <Header onAddProject={() => { setShowProject(true) }} selectedProject={selectedProject} onRefresh={onRefreshActiveSession} />
-                {activeSection === "reports" && <Reports ref={reportsRef} selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''} />}
-                {activeSection === "tasks" && <Tasks ref={tasksRef} selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''}/>}
+                <Header onAddProject={() => { setShowProject(true) }} selectedProject={selectedProject} onRefresh={onRefreshActiveSession} contentShown={isYourself} toggleDropdown={toggleDropdown} showContentTag = {activeSection === 'notification' ?  false : true}/>
+                {activeSection === "reports" && <Reports ref={reportsRef} contentShown={isYourself} selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''} />}
+                {activeSection === "tasks" && <Tasks ref={tasksRef} contentShown={isYourself} selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''} />}
                 {activeSection === "notification" && <Notification ref={notificationRef} selectedProjectId={projects.find(p => p.name === selectedProject)?.id || projects.find(p => p.name === selectedProject)?._id || ''} />}
             </div>
 

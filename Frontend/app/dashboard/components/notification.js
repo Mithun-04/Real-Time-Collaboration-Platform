@@ -4,12 +4,14 @@ import { TbRefresh } from "react-icons/tb";
 import Cookies from "universal-cookie";
 import { format } from "timeago.js";
 import toast from "react-hot-toast";
+import { Trash } from 'lucide-react';
 import axios from "axios";
 import { io } from "socket.io-client";
 
 
 
 const Notification = forwardRef(function Notification({ selectedProjectId }, ref) {
+
   const [activeTab, setActiveTab] = useState("my-invitation");
   const [messageContent, setmesssageContent] = useState("");
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,6 +23,7 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [username, setUsername] = useState(null);
   const scrollRef = useRef();
   const socketRef = useRef();
 
@@ -31,10 +34,14 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
   const maxAvatars = 4;
   const extraUsers = onlineUsers.length > maxAvatars ? onlineUsers.length - maxAvatars : 0;
 
-
-
   const cookies = new Cookies();
   const user = cookies.get("user");
+
+
+  useEffect(() => {
+    const name = cookies.get("user")?.name;
+    setUsername(name);
+  }, []);
 
 
   useEffect(() => {
@@ -64,12 +71,12 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
     if (showDropdown) {
       timer = setTimeout(() => {
         setShowDropdown(false);
-      }, 10000); // 10 seconds
+      }, 10000);
     }
     return () => clearTimeout(timer); // Cleanup timer on unmount or state change
   }, [showDropdown]);
 
-  
+
   useEffect(() => {
     setSearchResults([]);
     setSearchQuery('');
@@ -79,6 +86,7 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
   useEffect(() => {
     console.log(onlineUsers);
   }, [onlineUsers])
+
   useEffect(() => {
     if (selectedProjectId) {
       socketRef.current.emit("joinProject", selectedProjectId, user.name);
@@ -120,6 +128,17 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
     '#F08080', // Light Coral
     '#B0C4DE'  // Light Steel Blue
   ];
+
+  const normalizeCode = (content) => {
+    const lines = content.trim().split('\n'); // Split into lines and remove leading/trailing whitespace
+    const minIndent = lines
+      .filter(line => line.trim())
+      .reduce((min, line) => Math.min(min, line.match(/^\s*/)[0].length), Infinity);
+    return lines
+      .map(line => line.slice(minIndent)) // Remove common leading whitespace
+      .join('\n')
+      .trim();
+  };
 
   // Hash function to pick a color based on project name
   function getColor(name) {
@@ -363,6 +382,10 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
     }
   }));
 
+  const isManager = () => {
+    if (!projectMembers || projectMembers.length === 0) return false;
+    return projectMembers.some(member => member.role === 'manager' && member.name === username);
+  }
   return (
     <div className="notification-container">
       <div className="invitation-container">
@@ -512,14 +535,22 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
               <div className="project-members-list">
                 {projectMembers.map(member => (
                   <div className="project-member-item" key={member.userId}>
-                    <div className="member-avatar" style={{ backgroundColor: getColor(member.name), color: 'black' }}>
-                      {member.name[0]}
+                    <div className="member-info">
+                      <div className="member-avatar" style={{ backgroundColor: getColor(member.name), color: 'black' }}>
+                        {member.name[0]}
+                      </div>
+                      <div className="member-details">
+                        <h3>{member.name}</h3>
+                        <p className={`role${(member.role === 'manager') ? ' manager' : ''}`}>{member.role}</p>
+                      </div>
                     </div>
-                    <div className="member-details">
-                      <h3>{member.name}</h3>
-                      {/* <p>{member.email}</p> */}
-                      <p className={`role${(member.role === 'manager') ? ' manager' : ''}`}>{member.role}</p>
-                    </div>
+                    {isManager() &&
+                      <div className="remove-member" onClick={() => { }}>
+                        <>
+                          {member.role !== 'manager' && <Trash />}
+                        </>
+                      </div>
+                    }
                   </div>
                 ))}
               </div>
@@ -579,7 +610,9 @@ const Notification = forwardRef(function Notification({ selectedProjectId }, ref
                   </div>
                   <div className="message-details">
                     <div className="message-sender">{msg.senderId?.name === cookies.get("user")?.name ? 'You' : msg.senderId?.name}</div>
-                    <div className="message-text">{msg.content}</div>
+                    <div className="message-text">
+                      {msg.content}
+                    </div>
                   </div>
                 </div>
                 <div className="message-bottom">

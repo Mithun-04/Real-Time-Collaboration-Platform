@@ -99,6 +99,37 @@ const inviteMembers = async (req, res) => {
     }
 };
 
+const deleteProjectMember = async (req, res) => {
+    try {
+
+        const projectId = req.params.id;
+        const userId = req.user.id;
+       
+        if (!projectId || !userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Project ID and User ID are required',
+            });
+        }
+
+        const response = await projectService.deleteProjectMember(projectId, userId);
+
+        res.status(200).json({
+            success: true,
+            message: response.message || 'Project member deleted successfully',
+        });
+        
+    } catch (error) {
+        const status = error.status || 500;
+        const message = error.message || 'Failed to delete project member';
+        res.status(status).json({
+            success: false,
+            status: status,
+            message,
+        });
+    }
+}
+
 const getProjectMembers = async (req, res) => {
     try {
         // Accept projectId from req.body.projectId or req.query.projectId or req.params.id
@@ -209,5 +240,6 @@ export default {
     inviteMembers,
     getProjectMembers,
     addMessagetoProject,
+    deleteProjectMember,
     getMessages
 };

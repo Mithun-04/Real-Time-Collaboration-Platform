@@ -16,7 +16,7 @@
     align-items: center;
     border: #6b6262 1px solid;
     width: 100%;
-    /* display: none; */
+    /* display: none;  */
     max-height: 100%;
     height: 100%;
     padding: 1.5rem;
@@ -266,12 +266,26 @@
   align-items: center;
   border: #ffffff 0.1px solid;
   width: 100%;
+  justify-content: space-between;
   gap: 1rem;
   padding: 20px;
   border-right: #e0e0e0 4px solid; /* subtle green accent */
   margin-bottom: 8px;
   border-radius: 16px;
   transition: box-shadow 0.3s ease;
+}
+
+.member-info{
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.remove-member {
+  width: 30px;
+  height: 30px;
+  color: #ff3b6c; /* Red */
+  cursor: pointer;
 }
 
 .member-avatar {
@@ -380,6 +394,10 @@
   color: #f4f1f1;
   margin-top: 0.2rem;
   font-size: 1rem;
+    white-space: pre-wrap;
+  word-wrap: break-word;
+  /* white-space: pre-wrap; */
+  /* overflow-x: auto;   */
 }
 .message-bottom {
   display: flex;

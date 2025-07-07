@@ -21,6 +21,14 @@ export const createTask = async (req, res) => {
 export const getProjectTasks = async (req, res) => {
     try {
         const projectId = req.params.projectId;
+
+        if(!projectId) {
+            return res.status(400).json({
+                success: false,
+                error: "Project ID is required"
+            });
+        }
+
         const userId = req.user.id;
 
         const tasks = await taskService.getProjectTasks(projectId, userId);
@@ -32,7 +40,7 @@ export const getProjectTasks = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             success: false,
-            error: error.message
+            error: error.message || 'Failed to retrieve tasks'
         });
     }
 };
@@ -55,17 +63,21 @@ export const getAllTasks = async ( req, res) =>{
         })
     }
 }
-// Get All Tasks Assigned to Logged-in User
+
 export const getUserTasks = async (req, res) => {
     try {
-        const tasks = await taskService.getUserTasks(req.user.id);
+        const userId = req.user.id;
+        console.log("User ID:", userId); // Debugging line to check the user ID
+        if (!userId) {
+            return res.status(400).json({ error: "User ID is required" });
+        }
+        const tasks = await taskService.getUserTasks(userId);
         res.json(tasks);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 };
 
-//  Update Task (Assigned User or Manager)
 export const updateTaskStatus = async (req, res) => {
     try {
         const taskId = req.params.id;
@@ -88,7 +100,6 @@ export const updateTaskStatus = async (req, res) => {
     }
 };
 
-// Delete Task (Manager Only)
 export const deleteTask = async (req, res) => {
     try {
         await taskService.deleteTask(req.params.id);

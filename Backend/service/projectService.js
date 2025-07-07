@@ -183,6 +183,41 @@ const getProjectMembers = async (projectId) => {
 };
 
 
+const deleteProjectMember = async (projectId, userId) => {
+    try {
+        const project = await Project.findById(projectId);
+        if (!project) {
+            throw { status: 404, message: 'Project not found' };
+        }
+
+        const memberIndex = project.members.findIndex(member => member.userId.toString() === userId.toString());
+        if( memberIndex === -1) {
+            throw { status: 400, message: 'User is not a member of this project' };
+        }
+
+        project.members.splice(memberIndex, 1);
+        project.updatedAt = new Date();
+        await project.save();
+
+
+        const user = await User.findById(userId);
+        if (!user) {
+            throw { status: 404, message: 'User not found' };
+        }
+
+        user.projects = user.projects.filter(project => project.projectId.toString() !== projectId.toString());
+        user.updatedAt = new Date();
+        await user.save();
+
+        return { message: 'Project member deleted successfully' };
+
+    }
+    catch (error) {
+        throw { status: error.status || 500, message: error.message || 'Failed to delete project member' };
+    }
+}
+
+
 const addMessageToProject = async (projectId, senderId, content) => {
     try {
         const project = await Project.findById(projectId);
@@ -236,5 +271,6 @@ export default {
     inviteMembersToProject,
     getProjectMembers,
     addMessageToProject,
+    deleteProjectMember,
     getMessages
 }

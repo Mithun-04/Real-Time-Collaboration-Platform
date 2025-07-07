@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
 import '../styles/tasks.css';
+import { user } from '@heroui/theme';
 
 
 // const initialTasks = [
@@ -19,7 +20,7 @@ import '../styles/tasks.css';
 //     },
 // ];
 
-const Tasks = forwardRef(function Tasks({ selectedProjectId }, ref) {
+const Tasks = forwardRef(function Tasks({ selectedProjectId, contentShown }, ref) {
     const [tasks, setTasks] = useState([]);
     const [taskName, setTaskName] = useState('');
     const [taskDescription, setTaskDescription] = useState('');
@@ -33,6 +34,12 @@ const Tasks = forwardRef(function Tasks({ selectedProjectId }, ref) {
     const [projectMembers, setProjectMembers] = useState([]);
 
     const cookies = new Cookies();
+    const [username, setUsername] = useState(null);
+
+    useEffect(() => {
+        const name = cookies.get("user")?.name;
+        setUsername(name);
+    }, []);
 
     const colors = [
         '#FFB6C1', // Light Pink
@@ -47,7 +54,6 @@ const Tasks = forwardRef(function Tasks({ selectedProjectId }, ref) {
         '#B0C4DE'  // Light Steel Blue
     ];
 
-    // Hash function to pick a color based on project name
     function getColor(name) {
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
@@ -60,13 +66,13 @@ const Tasks = forwardRef(function Tasks({ selectedProjectId }, ref) {
         if (!selectedProjectId) return;
         getProjectTasks();
         fetchProjectMembers(selectedProjectId);
-    }, [selectedProjectId]);    
+    }, [selectedProjectId, contentShown]);
 
     useImperativeHandle(ref, () => ({
         refreshTasks: getProjectTasks
     }));
 
-    const handleStatusChange = async(taskId) => {
+    const handleStatusChange = async (taskId) => {
         setClickedTask(taskId);
         setTimeout(async () => {
             const taskToUpdate = tasks.find((task) => task._id === taskId);
@@ -86,14 +92,14 @@ const Tasks = forwardRef(function Tasks({ selectedProjectId }, ref) {
             }
 
             try {
-                const response = await axios.put(`http://localhost:5000/api/tasks/${taskId}`, {status : newStatus}, {
+                const response = await axios.put(`http://localhost:5000/api/tasks/${taskId}`, { status: newStatus }, {
                     headers: {
-                        'Content-Type': 'application/json', 
+                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     }
                 });
                 if (response.status === 200) {
-                        setTasks((prevTasks) =>
+                    setTasks((prevTasks) =>
                         prevTasks.map((task) =>
                             task._id === taskId ? { ...task, status: newStatus } : task
                         )
@@ -161,23 +167,23 @@ const Tasks = forwardRef(function Tasks({ selectedProjectId }, ref) {
             toast.error("You are not logged in. Please log in to view tasks.");
             return;
         }
+        const url = contentShown
+            ? `http://localhost:5000/api/tasks/${selectedProjectId}`
+            : `http://localhost:5000/api/tasks/allTasks/${selectedProjectId}`;
         try {
-            const response = await axios.get(`http://localhost:5000/api/tasks/${selectedProjectId}`, {
+            const response = await axios.get(url, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
             if (response.status) {
                 console.log('Response :', response.data.data.length);
-                if(response.data?.data?.length === 0) {
+                if (response.data?.data?.length === 0) {
                     setTasks([]);
                     // toast.success("No tasks found for this project");
                     return;
                 }
-                // toast.success("Tasks fetched successfully");
-                // console.log('Fetched tasks:', response.data.data);
                 setTasks(response.data.data);
-                // setTasks(response.data.data);
             } else {
                 toast.error(response.data.message || "Failed to fetch tasks");
             }
@@ -193,7 +199,7 @@ const Tasks = forwardRef(function Tasks({ selectedProjectId }, ref) {
         <div className="task-item" key={task._id}>
             <div className="task-item-header">
                 <div className="task-title-section">
-                    {task.status !== 'done' && (
+                    {task.status !== 'done' && task.assignedTo?.name === username && (
                         <CircleCheck
                             className="completion-circle"
                             strokeWidth={1}
@@ -202,7 +208,7 @@ const Tasks = forwardRef(function Tasks({ selectedProjectId }, ref) {
                             style={{ cursor: 'pointer' }}
                         />
                     )}
-                    <h3>{task.title}</h3>
+                    <h3 className={task.dueDate ? new Date(task.dueDate) < new Date() && task.status !== 'done' ? 'overdue-task' : '' : ''}>{task.title}</h3>
                 </div>
                 <div className="task-meta">
                     <span className={`task-status ${task.status}`}>{task.status.replace('-', ' ')}</span>
@@ -214,7 +220,10 @@ const Tasks = forwardRef(function Tasks({ selectedProjectId }, ref) {
                     <div className="task-assignee-avatar" style={{ backgroundColor: getColor(task.assignedTo?.name || ''), color: 'black' }} title={`Assigned to ${task.assignedTo?.name}`}>{task.assignedTo?.name ? task.assignedTo.name[0] : '?'}</div>
                     <span className={`task-priority ${task.priority.toLowerCase()}`}>{task.priority}</span>
                 </div>
-                <div className="task-deadline-text">Deadline: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}</div>
+                <div className={`task-deadline-text ${task.dueDate ? new Date(task.dueDate) < new Date() && task.status !== 'done' ? 'overdue' : '' : ''}`}>Deadline: <span>
+                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}
+                    </span>
+                </div>
             </div>
         </div>
     );
@@ -309,7 +318,7 @@ const Tasks = forwardRef(function Tasks({ selectedProjectId }, ref) {
                     </div>
                 </div>
             </div>
-            <div className={`task-assignment-container ${showTaskAssignment ? "show" : ""}`}>
+            <div className={`task-assignment-container ${showTaskAssignment ? "show" : ""}`}style={{ display: showTaskAssignment ? 'block' : 'none' }   }>
                 <div className='task-assignment-header'>
                     <h1 className='task-assignment-title'>Task Assignment</h1>
                     <X className='task-assignment-close' onClick={() => setShowTaskAssignment(false)} />

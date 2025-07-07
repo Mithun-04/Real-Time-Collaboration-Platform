@@ -1,5 +1,6 @@
 import '../styles/sideBar.css';
 import { FaTasks, FaCalendarAlt, FaFileAlt, FaSignOutAlt } from 'react-icons/fa';
+import { MdNotificationsActive } from "react-icons/md";
 import { ChartNoAxesCombined } from 'lucide-react';
 import { MdManageAccounts } from "react-icons/md";
 
@@ -21,8 +22,8 @@ export default function SideBar({ onNavigate, onClose }) {
                         Tasks
                     </li>
                     <li className="sidebar-item" onClick={() => onNavigate("notification")}>
-                        <MdManageAccounts className="sidebar-icon" />
-                        Manage
+                        <MdNotificationsActive className="sidebar-icon" />
+                         Notifications
                     </li>
                     <li className="sidebar-item">
                         <FaFileAlt className="sidebar-icon" />

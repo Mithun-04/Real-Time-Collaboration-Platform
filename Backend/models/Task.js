@@ -26,10 +26,10 @@ const taskSchema = new mongoose.Schema(
     dueDate: { type: Date },
   },
   { 
-    timestamps: true // Automatically adds createdAt & updatedAt
+    timestamps: true 
   }
 );
 
-// Export the Task model properly for ES Modules
+
 const Task = mongoose.model("Task", taskSchema);
 export default Task;

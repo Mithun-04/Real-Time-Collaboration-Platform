@@ -1,12 +1,12 @@
 import { BarChart } from '@mui/x-charts/BarChart';
-import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
+import { Gauge } from '@mui/x-charts/Gauge';
 import '../styles/reports.css';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import Cookies from 'universal-cookie';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
-const Reports = forwardRef(function Reports({ selectedProjectId }, ref) {
+const Reports = forwardRef(function Reports({ selectedProjectId, contentShown }, ref) {
     useImperativeHandle(ref, () => ({
         refreshReports: () => {
             fetchProjectTasks(selectedProjectId);
@@ -17,16 +17,17 @@ const Reports = forwardRef(function Reports({ selectedProjectId }, ref) {
     const [noOfTasks, setNoOfTasks] = useState(0);
     const [completedTasks, setCompletedTasks] = useState(0);
     const [incompleteTasks, setIncompleteTasks] = useState(0);
+    const [overdueTasks, setOverdueTasks] = useState(0); // Not used but can be implemented later
     const [pData, setPData] = useState([0, 0, 0]); // Dynamic data for BarChart
 
     const cookie = new Cookies();
 
-    const xLabels = ['To Do', 'Doing', 'Done'];
+    
+    const xLabels = overdueTasks > 0 ? ['To Do', 'Doing', 'Done' , 'Overdue'] : ['To Do', 'Doing', 'Done'];
 
-    const fetchProjectTasks = async (selectedProjectId) => {
+    const fetchProjectTasks = async (selectedProjectId, contentShown) => {
         try {
             if (!selectedProjectId) {
-                toast.error("No Project selected");
                 setProjectTasks([]);
                 return;
             }
@@ -36,7 +37,11 @@ const Reports = forwardRef(function Reports({ selectedProjectId }, ref) {
                 return;
             }
 
-            const response = await axios.get(`http://localhost:5000/api/tasks/allTasks/${selectedProjectId}`, {
+            const url = contentShown
+                ? `http://localhost:5000/api/tasks/${selectedProjectId}`
+                : `http://localhost:5000/api/tasks/allTasks/${selectedProjectId}`;
+
+            const response = await axios.get(url, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -53,6 +58,36 @@ const Reports = forwardRef(function Reports({ selectedProjectId }, ref) {
             toast.error(error?.response?.data?.message || error.message || "An error occurred");
         }
     };
+    const fetchUserTasks = async (contentShown) => {
+        try {
+            if (!contentShown) {
+                setProjectTasks([]);
+                return;
+            }
+
+            const token = cookie.get("token");
+            if (!token) {
+                toast.error("No token Provided");
+                return;
+            }
+            const response = await axios.get("http://localhost:5000/api/tasks/user/tasks", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.status) {
+                if (response.data?.data?.length === 0) {
+                    setProjectTasks([]);
+                    return;
+                }
+                console.log("User Tasks:", response.data);
+                setProjectTasks(response.data);
+            } else {
+                toast.error(response.message || "Failed to fetch tasks");
+            }
+        } catch (error) {
+            toast.error(error?.response?.message || error.message || "An error occurred");
+        }
+    };
 
     const computeTasks = (tasks) => {
         let ccount = 0;
@@ -60,6 +95,7 @@ const Reports = forwardRef(function Reports({ selectedProjectId }, ref) {
         let toDoCount = 0;
         let doingCount = 0;
         let doneCount = 0;
+        let OverdueCount = 0;
 
         tasks.forEach(task => {
             if (task.status === "done") {
@@ -72,17 +108,29 @@ const Reports = forwardRef(function Reports({ selectedProjectId }, ref) {
                 icount++;
                 toDoCount++;
             }
+            if (task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "done") {
+                console.log("Overdue Task:", task);
+                OverdueCount++;
+            }
         });
+
+        let pd = OverdueCount > 0 ? [toDoCount, doingCount, doneCount, OverdueCount] : [toDoCount, doingCount, doneCount];
 
         setNoOfTasks(tasks.length);
         setCompletedTasks(ccount);
         setIncompleteTasks(icount);
-        setPData([toDoCount, doingCount, doneCount]); // Update BarChart data
+        setOverdueTasks(OverdueCount); // Update overdue tasks count if needed
+        setPData(pd); 
     };
 
     useEffect(() => {
-        fetchProjectTasks(selectedProjectId);
-    }, [selectedProjectId]);
+        fetchProjectTasks(selectedProjectId, contentShown);
+    }, [selectedProjectId, contentShown]);
+    useEffect(() => {
+        if (!selectedProjectId) {
+            fetchUserTasks(contentShown);
+        }
+    }, []);
 
     useEffect(() => {
         computeTasks(projectTasks);
@@ -94,7 +142,7 @@ const Reports = forwardRef(function Reports({ selectedProjectId }, ref) {
                 <div className="dashboard-widgets">
                     <div className="widget stat">Completed tasks <span>{completedTasks}</span></div>
                     <div className="widget stat">Incomplete tasks <span>{incompleteTasks}</span></div>
-                    <div className="widget stat">Overdue tasks <span>0</span></div>
+                    <div className="widget stat">Overdue tasks <span>{overdueTasks}</span></div>
                     <div className="widget stat">Total tasks <span>{noOfTasks}</span></div>
                 </div>
 

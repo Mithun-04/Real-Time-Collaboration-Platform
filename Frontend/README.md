@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+# Real-Time Collaboration Platform
+
+A full-stack, real-time project management and collaboration platform built with Next.js, Node.js, Express, MongoDB, and Socket.IO.
+
+## Features
+
+- **User Authentication:** Secure login and signup with JWT.
+- **Project Management:** Create, view, and manage multiple projects.
+- **Task Management:** Assign, update, and track tasks with priorities, deadlines, and status.
+- **Invitations:** Invite users to projects and manage invitations.
+- **Team Management:** View and manage project members, with manager/member roles.
+- **Real-Time Messaging:** Project-based chat with live updates using Socket.IO.
+- **Notifications:** Real-time notifications for invitations and project events.
+- **Dashboard & Reports:** Visualize project progress, completed/incomplete/overdue tasks, and team activity.
+- **Responsive UI:** Modern, responsive design with Tailwind CSS and MUI charts.
+
+## Tech Stack
+
+- **Frontend:** Next.js, React, Tailwind CSS, MUI, Axios, React Hot Toast, Socket.IO Client
+- **Backend:** Node.js, Express, MongoDB (Mongoose), JWT, Bcrypt, Socket.IO
+- **Real-Time:** Socket.IO server for chat and online presence
+- **Other:** Universal Cookie, timeago.js, Lucide React Icons
+
+## Monorepo Structure
+
+```
+Real-Time-Collaboration-Platform/
+│
+├── Backend/      # Express API, MongoDB models, business logic
+├── Frontend/     # Next.js app, React components, styles
+├── Socket/       # Socket.IO server for real-time features
+└── README.md     # Project documentation
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (v18+ recommended)
+- MongoDB (local or Atlas)
+
+### 1. Clone the repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/Real-Time-Collaboration-Platform.git
+cd Real-Time-Collaboration-Platform
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Install for each part:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd Backend
+npm install
 
-## Learn More
+cd ../Frontend
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+cd ../Socket
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. Configure Environment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Create a `.env` file in `Backend/` with your MongoDB URI and JWT secret.
 
-## Deploy on Vercel
+Example:
+```
+MONGO_URI=mongodb://localhost:27017/rtc-platform
+JWT_SECRET=your_jwt_secret
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 4. Run the servers
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Backend API:**
+```bash
+cd Backend
+npm start
+```
+
+**Frontend (Next.js):**
+```bash
+cd Frontend
+npm run dev
+```
+
+**Socket.IO Server:**
+```bash
+cd Socket
+node index.js
+```
+
+### 5. Open the app
+
+Visit [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Usage
+
+- **Sign up / Log in** to your account.
+- **Create a project** or join via invitation.
+- **Add tasks** to projects, assign to members, set deadlines and priorities.
+- **Chat** in real-time with your team in each project.
+- **View reports** and dashboards for project progress.
+- **Manage team members** and invitations.
+
+## Development
+
+- Frontend code: `Frontend/app/`
+- Backend API: `Backend/`
+- Real-time server: `Socket/`
+
+## Scripts
+
+- `npm run dev` (Frontend): Start Next.js dev server
+- `npm start` (Backend): Start Express API
+- `node index.js` (Socket): Start Socket.IO server
+
+## License
+
+This project is licensed under the MIT License.
